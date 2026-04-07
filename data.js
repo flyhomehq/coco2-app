@@ -1,7 +1,7 @@
 const IMGS = {
     // 배경 이미지
     yellowPlane: 'images/backgrounds/1p_bg_language_select.PNG',
-    cockpitCoco: 'images/backgrounds/2-1p_bg_mode_select.PNG',
+    cockpitCoco: 'images/backgrounds/2p_plane.PNG',
     cockpitRunway: 'images/backgrounds/2p_plane.PNG',
     instruments: 'images/backgrounds/3p_bg_settings_beginner.png',
     flightReady: 'images/backgrounds/4p_예비_시뮬비행시작전.PNG',
@@ -18,10 +18,10 @@ const IMGS = {
     charSeyeon:   'images/characters/투명케릭터2.png',
     charGuitar:   'images/characters/완전투명.png',
     charThumbsUp: 'images/characters/완전투명.png',
-    charSitting:  'images/char_guide_web_01투명배경앉아있는케릭터.png',
-    charWoman:    'images/char_woman_guide_web_01투명배경케릭터.png',
-    charWomanGuitar: 'images/char_woman_guide_web_01투명배경케릭터기타.png',
-    charP2:       'images/characters/p2_char_guide_web.png',
+    charSitting:  'images/characters/투명케릭터2.png',
+    charWoman:    'images/characters/투명케릭터2.png',
+    charWomanGuitar: 'images/characters/투명케릭터2.png',
+    charP2:       'images/characters/투명케릭터2.png',
 
     // 계기판/콕핏 오버레이 이미지
     instrKR:    'images/backgrounds/3p_bg_settings_beginner.png',

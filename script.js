@@ -516,9 +516,13 @@ const App = {
   },
 
   goTo(pageId) {
-    // 이전 음성/대화 즉시 중단
+    // 이전 음성/대화/타이머 즉시 중단
     window.speechSynthesis.cancel();
     clearInterval(this._dialogTimer);
+    clearTimeout(this._featureTimer);
+    clearTimeout(this._tourTimer);
+    clearTimeout(this._fiveMinTimer);
+    clearTimeout(this._briefingTimer);
     // p1 영상 정지
     const p1v = document.getElementById('p1-video');
     if (p1v) { p1v.pause(); p1v.muted = true; }
@@ -777,62 +781,7 @@ const App = {
     }, {passive:true});
   },
 
-  // (레거시 호환)
-  _featureSlides_legacy: [
-    {img:'images/backgrounds/2p_plane.PNG', title:'CockpitOS 기능 소개', text:'아직 시뮬레이터와 연결되지 않았습니다.\n지금부터 이 앱의 주요 기능을 소개합니다.'},
-    {img:'images/seoul/이륙1.png', title:'기능 1: 원클릭 비행', text:'복잡한 절차 없이 버튼 하나면\n비행기가 활주로에서 이륙하여 하늘을 납니다.\n시뮬레이터의 모든 설정을 앱이 대신합니다.'},
-    {img:'images/seoul/서울 원경.png', title:'기능 2: 실시간 여행 가이드', text:'비행 중 현재 위치의 관광지를\nAI 교관 코코가 자동으로 안내합니다.\n남산타워, 한강, 롯데월드를 하늘에서 만나세요.'},
-    {img:'images/crash/추락2.png', title:'기능 3: 타임머신', text:'추락해도 걱정 마세요.\n되돌리기 버튼 한 번이면\n원래 자리에서 다시 시작합니다.'},
-    {img:'images/instruments/cessna.PNG', title:'기능 4: AI 계기판 교육', text:'복잡한 계기판, 탭 한 번이면\n코코가 하나씩 쉽게 설명합니다.\n어려운 항공 용어를 4개 국어로 번역합니다.'},
-    {img:'images/ads/날으는 광고1.PNG', title:'기능 5: 위치 기반 광고', text:'비행 경로에 따라 지역 광고가 표시됩니다.\n광고주에게는 새로운 채널\n여행자에게는 맛집과 관광 정보를 제공합니다.'},
-    {img:'images/backgrounds/1p_bg_language_select.PNG', title:'시뮬레이터 연결 시', text:'이 모든 기능이 버튼 하나로 작동합니다.\n한국어 AI 비행 교관은 전 세계에 이 앱뿐입니다.\n감사합니다.'},
-  ],
-  _featureIdx: 0,
-  _featureTimer: null,
-
-  _runTakeoffSequence() {
-    this._featureIdx = 0;
-    this._showFeatureSlide();
-  },
-
-  _showFeatureSlide() {
-    const slide = this._featureSlides[this._featureIdx];
-    if (!slide) {
-      this._showFiveMinPrompt();
-      return;
-    }
-    const s = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-    // 미리보기 이미지 + 배경
-    const preview = document.getElementById('tour-preview');
-    const tourBg = document.getElementById('tour-bg');
-    if (preview) preview.src = slide.img;
-    if (tourBg) tourBg.src = slide.img;
-    // 오버레이 텍스트
-    const overlay = document.getElementById('tour-overlay');
-    const overlayText = document.getElementById('tour-overlay-text');
-    if (overlay) overlay.style.display = 'flex';
-    if (overlayText) overlayText.innerHTML = '';
-    // 지역 카드로 설명 표시
-    const card = document.getElementById('tour-card');
-    if (card) {
-      s('tour-card-title', slide.title);
-      s('tour-card-desc', slide.text.replace(/\n/g, ' '));
-      card.style.display = 'block';
-    }
-    // 상단 정보
-    s('tour-alt', ''); s('tour-spd', '');
-    s('tour-loc', (this._featureIdx + 1) + '/' + this._featureSlides.length);
-    s('sim-status', '📖 앱 기능 소개 중');
-    // 코코 음성 (이모지 제거)
-    const cleanText = (slide.title + '. ' + slide.text.replace(/\n/g, ' ')).replace(/[\u{1F300}-\u{1FAD6}\u{2600}-\u{27BF}]/gu, '');
-    this._say(cleanText);
-    // 다음 슬라이드 (TTS 끝나면 또는 20초 후)
-    clearTimeout(this._featureTimer);
-    this._featureTimer = setTimeout(() => {
-      this._featureIdx++;
-      this._showFeatureSlide();
-    }, 20000);
-  },
+  // (레거시 코드 제거됨 — 기능 소개는 p312 카드 + showFeatureDetail()로 대체)
 
   _showTourSlide() {
     const loc = this.flightLoc || 'seoul';
@@ -1065,19 +1014,9 @@ const App = {
     document.querySelectorAll('[id^="cl-"]').forEach(el => el.style.borderColor = 'rgba(255,255,255,0.08)');
     const sel = document.getElementById('cl-'+idx);
     if (sel) sel.style.borderColor = 'rgba(245,166,35,0.6)';
-    // 아래 영역에 안내
-    const ansEl = null; // 하단 답변창에만 표시
-    if (ansEl) ansEl.textContent = '생각하는 중...';
+    // 하단 답변창에 표시
     const sys = {ko:'당신은 CockpitOS의 AI 비행 교관 코코입니다. 시뮬레이터 앞에 앉은 사용자에게 즉시 행동할 수 있는 짧은 안내를 해주세요. 2문장 이내. 마크다운 기호 사용하지 마세요.',en:'You are Coco, AI flight instructor. Give short, actionable guidance. Max 2 sentences. No markdown.',ja:'あなたはAI教官ここです。短く実用的な案内をしてください。2文以内。',zh:'你是AI教官可可。简短实用的指导。不超过2句话。'}[this.lang];
-    (async () => {
-      await this._callAI(item.prompt, sys);
-      const copyToAnswer = () => {
-        const dialogText = document.getElementById('dcontent')?.textContent || '';
-        if (ansEl && dialogText && dialogText !== '...') ansEl.textContent = dialogText;
-      };
-      setTimeout(copyToAnswer, 2000);
-      setTimeout(copyToAnswer, 5000);
-    })();
+    this._callAI(item.prompt, sys);
   },
 
   _explainChecklist(title, prompt) {
