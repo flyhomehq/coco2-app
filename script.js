@@ -507,6 +507,11 @@ const App = {
     // 이전 음성/대화 즉시 중단
     window.speechSynthesis.cancel();
     clearInterval(this._dialogTimer);
+    // p1 영상 정지
+    const p1v = document.getElementById('p1-video');
+    if (p1v) { p1v.pause(); p1v.muted = true; }
+    const p1btn = document.getElementById('p1-sound-btn');
+    if (p1btn) p1btn.textContent = '🔇';
 
     const oldPage = document.getElementById(this.currentPage);
     const newPage = document.getElementById(pageId);
@@ -520,6 +525,12 @@ const App = {
     // topbar 표시
     const showTop = ['p2','p3','p311','p312','p32','p4','p41','p42','p43','p44','p45','p5'].includes(pageId);
     document.getElementById('topbar').classList.toggle('hidden', !showTop);
+
+    // p1으로 돌아오면 영상 다시 재생
+    if (pageId === 'p1') {
+      const p1v = document.getElementById('p1-video');
+      if (p1v) { p1v.muted = true; p1v.play(); }
+    }
 
     // 배경 교체
     const bg = document.getElementById('bg');
