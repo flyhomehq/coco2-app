@@ -850,7 +850,7 @@ const App = {
     // 스와이프 지원
     this._initFeatureSwipe();
     // 코코 첫 멘트 (한 번만)
-    this._say('이 기능은 현재 개발 중입니다. 시뮬레이터와 심커넥트 연결이 완료되면, 사용자가 원클릭으로 비행할 수 있는 단축 조종판이 됩니다. 아래 카드로 주요 기능을 확인해주세요.');
+    this._say({ko:'이 기능은 현재 개발 중입니다. 시뮬레이터와 심커넥트 연결이 완료되면, 사용자가 원클릭으로 비행할 수 있는 단축 조종판이 됩니다. 아래 카드로 주요 기능을 확인해주세요.',en:'This feature is under development. Once SimConnect is linked, you can fly with one click. Check the feature cards below.',ja:'この機能は開発中です。SimConnect接続後、ワンクリックで飛行できます。下のカードで主要機能を確認してください。',zh:'此功能正在开发中。SimConnect连接后可一键飞行。请查看下方功能卡片。'}[this.lang]);
     // 하단 답변창 숨기기 (카드에 설명 포함)
     document.getElementById('dialog').style.display = 'none';
   },
@@ -1503,8 +1503,8 @@ const App = {
       const base64 = imageData.split(',')[1];
 
       if (!this.apiKey) {
-        document.getElementById('pip-capture-question').textContent = '🔑 API 키를 설정해주세요';
-        document.getElementById('pip-capture-answer').textContent = '설정 → API 키 입력 후 다시 시도하세요';
+        document.getElementById('pip-capture-question').textContent = {ko:'🔑 API 키를 설정해주세요',en:'🔑 Please set your API key',ja:'🔑 APIキーを設定してください',zh:'🔑 请设置API密钥'}[this.lang];
+        document.getElementById('pip-capture-answer').textContent = {ko:'설정 → API 키 입력 후 다시 시도하세요',en:'Settings → Enter API key and try again',ja:'設定 → APIキー入力後、再試行してください',zh:'设置 → 输入API密钥后重试'}[this.lang];
         return;
       }
 
@@ -1612,7 +1612,7 @@ const App = {
     const imageData = canvas.toDataURL('image/jpeg', 0.85);
     const base64 = imageData.split(',')[1];
 
-    const sys = {ko:'당신은 AI 비행 교관 코코입니다. 사용자가 카메라로 촬영한 이미지에 대해 추가 질문을 합니다. 정확하고 간결하게 3문장 이내로 답하세요. 비행 장비가 아니면 솔직하게 말하세요. 마크다운 기호 금지.',en:'You are Coco. Answer the follow-up question about this image. Max 3 sentences. No markdown.'}[this.lang] || 'Answer accurately in 3 sentences.';
+    const sys = {ko:'당신은 AI 비행 교관 코코입니다. 사용자가 카메라로 촬영한 이미지에 대해 추가 질문을 합니다. 정확하고 간결하게 3문장 이내로 답하세요. 비행 장비가 아니면 솔직하게 말하세요. 마크다운 기호 금지.',en:'You are Coco. Answer the follow-up question about this image. Max 3 sentences. No markdown.',ja:'あなたはAI教官ここです。カメラで撮影した画像についての追加質問に答えてください。正確で簡潔に3文以内。マークダウン記号禁止。',zh:'你是AI教官可可。回答关于此图像的后续问题。准确简洁，不超过3句话。禁止使用Markdown符号。'}[this.lang] || 'Answer accurately in 3 sentences.';
 
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1994,7 +1994,9 @@ const App = {
     const ansEl = null; // 하단 답변창에만 표시
     if (ansEl) ansEl.textContent = '생각하는 중...';
     // AI에게 액션형으로 질문
-    const actionPrompt = item.prompt.replace('설명해주세요','실제 콕핏에서 어떻게 찾고 조작하는지 초보자가 바로 따라할 수 있게 짧고 친절하게 안내해주세요. 2문장 이내.');
+    const replacements = {ko:['설명해주세요','실제 콕핏에서 어떻게 찾고 조작하는지 초보자가 바로 따라할 수 있게 짧고 친절하게 안내해주세요. 2문장 이내.'],en:['Explain','Give short, actionable cockpit guidance a beginner can follow immediately. Max 2 sentences.'],ja:['説明してください','初心者がすぐに実行できる短い実用的なコックピット案内をしてください。2文以内。'],zh:['解释','请给出初学者可以立即执行的简短实用驾驶舱指导。不超过2句话。']};
+    const r = replacements[this.lang] || replacements.en;
+    const actionPrompt = item.prompt.replace(r[0], r[1]);
     const sys = {ko:'당신은 CockpitOS의 AI 비행 교관 코코입니다. 시뮬레이터 앞에 앉은 훈련생에게 즉시 행동할 수 있는 짧은 안내를 해주세요. 2문장 이내. 마크다운 기호 사용하지 마세요.',en:'You are Coco, AI flight instructor. Give short, actionable guidance for a student sitting at a simulator. Max 2 sentences. No markdown.',ja:'あなたはAI教官ここです。シミュレーター前の訓練生に短く実用的な案内をしてください。2文以内。',zh:'你是AI教官可可。给坐在模拟器前的学员简短实用的指导。不超过2句话。'}[this.lang];
     // AI 응답을 서랍 안에도 표시
     (async () => {
