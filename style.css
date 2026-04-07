@@ -303,12 +303,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:#050a14;color:#fff;overflo
   /* 휴대폰: 배경을 거의 검게 → 카드 가시성 확보 */
   #bg::after{background:rgba(0,0,0,0.85)!important}
   #coco{height:15vh;max-height:105px;left:12%}
-  /* 휴대폰: p3 카드 정사각형 + 글자 안 잘림 */
-  .sel-card{min-height:180px!important;max-height:200px!important;margin-bottom:8px!important}
+  /* 휴대폰: p3 카드 — 방식A: 정사각형 + 이미지 위 글씨 겹침 */
+  .sel-card{min-height:140px!important;max-height:150px!important;margin-bottom:10px!important}
+  .sel-card>div{min-height:140px!important;padding:12px 14px!important;background:linear-gradient(rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.6) 100%)!important}
   .sel-title{font-size:20px!important}
-  .sel-sub{font-size:11px!important;margin-bottom:8px!important}
-  .sc-title{font-size:14px!important}
-  .sc-desc{font-size:11px!important}
+  .sel-sub{font-size:11px!important;margin-bottom:10px!important}
+  .sc-title{font-size:15px!important}
+  .sc-desc{font-size:11px!important;line-height:1.4!important}
 }
 @media (max-width:768px) and (min-width:481px) {
   /* 테블릿: 배경을 좀 더 어둡게 */
