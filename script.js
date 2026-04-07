@@ -2053,10 +2053,19 @@ const App = {
     ],
   },
 
+  _briefingVideos: [
+    'video/cockpitos-int.mp4',
+    'video/readytakeoff1.mp4',
+    'video/lifeshot.mp4',
+    'video/warn.mp4',
+    'video/landing.mp4',
+    'video/report.mp4',
+    'video/cockpitos-int.mp4',
+  ],
   get _briefingSlides() {
     const lang = this.lang || 'ko';
     const slides = this._briefingSlidesI18n[lang] || this._briefingSlidesI18n.ko;
-    return slides.map(s => ({...s, bg:'', coco:'images/characters/투명케릭터2.png'}));
+    return slides.map((s, i) => ({...s, bg:'', video:this._briefingVideos[i]||'', coco:'images/characters/투명케릭터2.png'}));
   },
   _briefingIdx: 0,
   _briefingTimer: null,
@@ -2071,7 +2080,22 @@ const App = {
   _showBriefingSlide() {
     const slide = this._briefingSlides[this._briefingIdx];
     if (!slide) { this.stopBriefing(); return; }
-    document.getElementById('briefing-bg').src = slide.bg;
+    // 배경: 영상 또는 이미지
+    const bgImg = document.getElementById('briefing-bg');
+    const bgVid = document.getElementById('briefing-video');
+    if (slide.video) {
+      bgImg.style.display = 'none';
+      bgVid.src = slide.video;
+      bgVid.style.display = 'block';
+      bgVid.play().catch(()=>{});
+    } else if (slide.bg) {
+      bgVid.style.display = 'none';
+      bgImg.src = slide.bg;
+      bgImg.style.display = 'block';
+    } else {
+      bgImg.style.display = 'none';
+      bgVid.style.display = 'none';
+    }
     document.getElementById('briefing-title').textContent = slide.title;
     document.getElementById('briefing-text').textContent = slide.text;
     document.getElementById('briefing-coco').src = slide.coco;
@@ -2120,6 +2144,8 @@ const App = {
   stopBriefing() {
     clearTimeout(this._briefingTimer);
     window.speechSynthesis.cancel();
+    const bgVid = document.getElementById('briefing-video');
+    if (bgVid) { bgVid.pause(); bgVid.src = ''; bgVid.style.display = 'none'; }
     document.getElementById('briefing-overlay').style.display = 'none';
   },
 
