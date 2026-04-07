@@ -611,7 +611,13 @@ const App = {
     this.pageStack.pop(); // 제거
     // goTo 로직 재실행 (배경만)
     const bg = document.getElementById('bg');
-    if (prev === 'p1') { bg.style.backgroundImage = 'none'; document.getElementById('topbar').classList.add('hidden'); }
+    if (prev === 'p1') {
+      bg.style.backgroundImage = 'none';
+      document.getElementById('topbar').classList.add('hidden');
+      // p1 영상 다시 재생 (음소거)
+      const p1v = document.getElementById('p1-video');
+      if (p1v) { p1v.muted = true; p1v.play(); }
+    }
     else if (prev === 'p2') bg.style.backgroundImage = `url(${IMGS.cockpitRunway})`;
     else if (prev === 'p3') bg.style.backgroundImage = `url(${IMGS.cockpitRunway})`;
     else if (prev === 'p4') bg.style.backgroundImage = `url(${IMGS.trainee})`;
