@@ -1850,8 +1850,8 @@ const App = {
     const descs = this._featureDetailsI18n[L] || this._featureDetailsI18n.ko;
     return [
       {img:'images/panel/p1.PNG', video:'video/cockpitos-int.mp4', desc:descs[0]},
-      {img:'images/panel/p2.PNG', video:'video/lifeshot1.mp4', desc:descs[1]},
-      {img:'images/panel/p3.PNG', video:'video/warn1.mp4', desc:descs[2]},
+      {img:'images/panel/p2.PNG', video:'video/lifeshot.mp4', desc:descs[1]},
+      {img:'images/panel/p3.PNG', video:'video/warn.mp4', desc:descs[2]},
       {img:'images/panel/p3-1.PNG', video:'video/timemachine3.mp4', desc:descs[3]},
       {img:'images/panel/p4.PNG', video:'video/landing.mp4', desc:descs[4]},
       {img:'images/panel/p5.PNG', video:'video/report.mp4', desc:descs[5]},
