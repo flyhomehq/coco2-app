@@ -258,17 +258,29 @@ const CONTENT = {
   },
   videos: {
     ko: [
-      {icon:'🛫',title:'세스나 이륙 장면',duration:'1:23',url:'https://www.youtube.com/watch?v=W1v4cZmKiuY'},
-      {icon:'📊',title:'계기판 기초 설명',duration:'3:10',url:'https://www.youtube.com/watch?v=W1v4cZmKiuY'},
-      {icon:'🎮',title:'MSFS 비행 시작하기',duration:'4:20',url:'https://www.youtube.com/watch?v=W1v4cZmKiuY'},
-      {icon:'🛬',title:'착륙 연습',duration:'2:45',url:'https://www.youtube.com/watch?v=W1v4cZmKiuY'},
+      {icon:'🛫',title:'세스나 이륙 장면',duration:'0:30',url:'video/readytakeoff1.mp4',local:true},
+      {icon:'📊',title:'계기판 기초 설명',duration:'0:18',url:'video/dashbord1.mp4',local:true},
+      {icon:'🎮',title:'MSFS 비행 시작하기',duration:'0:18',url:'video/msfs sim.mp4',local:true},
+      {icon:'🛬',title:'착륙 연습',duration:'0:04',url:'video/landing.mp4',local:true},
     ],
     en: [
-      {icon:'🛫',title:'Cessna Takeoff',duration:'1:23',url:'https://www.youtube.com/watch?v=W1v4cZmKiuY'},
-      {icon:'📊',title:'Reading Instruments',duration:'3:10',url:'https://www.youtube.com/watch?v=W1v4cZmKiuY'},
+      {icon:'🛫',title:'Cessna Takeoff',duration:'0:30',url:'video/readytakeoff1.mp4',local:true},
+      {icon:'📊',title:'Reading Instruments',duration:'0:18',url:'video/dashbord1.mp4',local:true},
+      {icon:'🎮',title:'MSFS Getting Started',duration:'0:18',url:'video/msfs sim.mp4',local:true},
+      {icon:'🛬',title:'Landing Practice',duration:'0:04',url:'video/landing.mp4',local:true},
     ],
-    ja: [{icon:'🛫',title:'セスナ離陸',duration:'1:23',url:'https://www.youtube.com/watch?v=W1v4cZmKiuY'}],
-    zh: [{icon:'🛫',title:'塞斯纳起飞',duration:'1:23',url:'https://www.youtube.com/watch?v=W1v4cZmKiuY'}],
+    ja: [
+      {icon:'🛫',title:'セスナ離陸',duration:'0:30',url:'video/readytakeoff1.mp4',local:true},
+      {icon:'📊',title:'計器盤基礎',duration:'0:18',url:'video/dashbord1.mp4',local:true},
+      {icon:'🎮',title:'MSFS入門',duration:'0:18',url:'video/msfs sim.mp4',local:true},
+      {icon:'🛬',title:'着陸練習',duration:'0:04',url:'video/landing.mp4',local:true},
+    ],
+    zh: [
+      {icon:'🛫',title:'塞斯纳起飞',duration:'0:30',url:'video/readytakeoff1.mp4',local:true},
+      {icon:'📊',title:'仪表盘基础',duration:'0:18',url:'video/dashbord1.mp4',local:true},
+      {icon:'🎮',title:'MSFS入门',duration:'0:18',url:'video/msfs sim.mp4',local:true},
+      {icon:'🛬',title:'着陆练习',duration:'0:04',url:'video/landing.mp4',local:true},
+    ],
   },
   trainee: {
     ko: {
@@ -952,7 +964,7 @@ const App = {
       const vs = CONTENT.videos[lang] || CONTENT.videos.ko;
       html = '<div class="dsec-title">' + (T[lang].db2 || '영상 보기') + '</div>';
       vs.forEach(v => {
-        html += `<div class="card-item" onclick="App._playVideo('${v.url}','${v.title}')">
+        html += `<div class="card-item" onclick="App._playVideo('${v.url}','${v.title}',${!!v.local})">
           <div class="fi-icon">${v.icon}</div>
           <div class="fi-text"><div class="ft">${v.title}</div><div class="fs">▶ ${v.duration}</div></div>
         </div>`;
@@ -1078,24 +1090,29 @@ const App = {
     this._callAI(prompt, sys[this.lang]);
   },
 
-  _playVideo(url, title) {
+  _playVideo(url, title, isLocal) {
     if (!url || url === '') {
       this.toast('🎬 ' + title + ' — 준비 중입니다');
       return;
     }
-    // YouTube URL에서 ID 추출
-    const match = url.match(/[?&]v=([^&]+)/);
-    if (match) {
-      const videoId = match[1];
-      // 앱 안에서 iframe으로 재생
-      const viewer = document.getElementById('img-viewer');
-      document.getElementById('iv-img').style.display = 'none';
-      document.getElementById('iv-caption').innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="border-radius:12px;max-width:560px"></iframe><div style="margin-top:8px;font-size:14px;color:#fff">${title}</div>`;
-      viewer.classList.add('show');
-      viewer.style.zIndex = '9999';
+    const viewer = document.getElementById('img-viewer');
+    document.getElementById('iv-img').style.display = 'none';
+    if (isLocal || url.endsWith('.mp4')) {
+      // 자체 영상 재생
+      document.getElementById('iv-caption').innerHTML = `<video src="${url}" autoplay playsinline controls style="max-width:95%;max-height:55vh;border-radius:12px;border:2px solid rgba(255,215,0,0.3)"></video><div style="margin-top:8px;font-size:14px;color:#fff">${title}</div>`;
     } else {
-      window.open(url, '_blank');
+      // YouTube URL에서 ID 추출
+      const match = url.match(/[?&]v=([^&]+)/);
+      if (match) {
+        const videoId = match[1];
+        document.getElementById('iv-caption').innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen style="border-radius:12px;max-width:560px"></iframe><div style="margin-top:8px;font-size:14px;color:#fff">${title}</div>`;
+      } else {
+        window.open(url, '_blank');
+        return;
+      }
     }
+    viewer.classList.add('show');
+    viewer.style.zIndex = '9999';
   },
 
   async _callAI(prompt, sys) {
@@ -1832,25 +1849,34 @@ const App = {
     const L = this.lang || 'ko';
     const descs = this._featureDetailsI18n[L] || this._featureDetailsI18n.ko;
     return [
-      {img:'images/panel/p1.PNG', desc:descs[0]},
-      {img:'images/panel/p2.PNG', desc:descs[1]},
-      {img:'images/panel/p3.PNG', desc:descs[2]},
-      {img:'images/panel/p3-1.PNG', desc:descs[3]},
-      {img:'images/panel/p4.PNG', desc:descs[4]},
-      {img:'images/panel/p5.PNG', desc:descs[5]},
+      {img:'images/panel/p1.PNG', video:'video/cockpitos-int.mp4', desc:descs[0]},
+      {img:'images/panel/p2.PNG', video:'video/lifeshot1.mp4', desc:descs[1]},
+      {img:'images/panel/p3.PNG', video:'video/warn1.mp4', desc:descs[2]},
+      {img:'images/panel/p3-1.PNG', video:'video/timemachine3.mp4', desc:descs[3]},
+      {img:'images/panel/p4.PNG', video:'video/landing.mp4', desc:descs[4]},
+      {img:'images/panel/p5.PNG', video:'video/report.mp4', desc:descs[5]},
     ];
   },
 
   showFeatureDetail(idx) {
     const d = this._featureDetails[idx];
     if (!d) return;
-    // 코코 숨기기
     document.getElementById('coco')?.classList.remove('show');
-    // 이미지 뷰어 사용 (z-index 최상위)
-    document.getElementById('iv-img').src = d.img;
-    document.getElementById('iv-caption').textContent = d.desc;
-    document.getElementById('img-viewer').classList.add('show');
-    document.getElementById('img-viewer').style.zIndex = '999';
+    const viewer = document.getElementById('img-viewer');
+    const img = document.getElementById('iv-img');
+    const cap = document.getElementById('iv-caption');
+    if (d.video) {
+      // 영상 재생
+      img.style.display = 'none';
+      cap.innerHTML = `<video src="${d.video}" autoplay playsinline controls style="max-width:95%;max-height:55vh;border-radius:12px;border:2px solid rgba(255,215,0,0.3)"></video><div style="margin-top:10px;font-size:14px;color:#fff;line-height:1.6">${d.desc}</div>`;
+    } else {
+      // 이미지 표시
+      img.style.display = '';
+      img.src = d.img;
+      cap.textContent = d.desc;
+    }
+    viewer.classList.add('show');
+    viewer.style.zIndex = '999';
   },
 
   showImgViewer(src, caption) {
@@ -1860,11 +1886,15 @@ const App = {
   },
   closeImgViewer() {
     document.getElementById('img-viewer').classList.remove('show');
-    // 영상 재생 중이면 정리
     const img = document.getElementById('iv-img');
     if (img) img.style.display = '';
     const cap = document.getElementById('iv-caption');
-    if (cap && cap.querySelector('iframe')) cap.innerHTML = '';
+    if (cap) {
+      // iframe(YouTube) 또는 video 정리
+      const v = cap.querySelector('video');
+      if (v) { v.pause(); v.src = ''; }
+      if (cap.querySelector('iframe') || cap.querySelector('video')) cap.innerHTML = '';
+    }
   },
 
   // ── 훈련생 모드 체크리스트 로드 ──
