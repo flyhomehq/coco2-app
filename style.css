@@ -303,13 +303,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:#050a14;color:#fff;overflo
   /* 휴대폰: 배경을 거의 검게 → 카드 가시성 확보 */
   #bg::after{background:rgba(0,0,0,0.85)!important}
   #coco{height:15vh;max-height:105px;left:12%}
-  /* 휴대폰: p3 카드 — 방식A: 정사각형 + 이미지 위 글씨 겹침 */
-  .sel-card{min-height:140px!important;max-height:150px!important;margin-bottom:10px!important}
-  .sel-card>div{min-height:140px!important;padding:12px 14px!important;background:linear-gradient(rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.6) 100%)!important}
+  /* 휴대폰: p3 카드 — 정사각형 2개 나란히 (언어 버튼 스타일) */
+  #p3 .sel-card-wrap{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:340px}
+  .sel-card{min-height:auto!important;max-height:none!important;margin-bottom:0!important;padding:0!important;aspect-ratio:1/1}
+  .sel-card img{display:none!important}
+  .sel-card>div{min-height:auto!important;height:100%!important;padding:14px 10px!important;background:none!important;justify-content:center!important;align-items:center!important;text-align:center}
   .sel-title{font-size:20px!important}
   .sel-sub{font-size:11px!important;margin-bottom:10px!important}
-  .sc-title{font-size:15px!important}
-  .sc-desc{font-size:11px!important;line-height:1.4!important}
+  .sc-title{font-size:14px!important}
+  .sc-desc{font-size:10px!important;line-height:1.4!important}
 }
 @media (max-width:768px) and (min-width:481px) {
   /* 테블릿: 배경을 좀 더 어둡게 */
