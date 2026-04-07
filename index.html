@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>CockpitOS — Hi Coco!</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#050a14">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=20260429">
+</head>
+<body>
+<div id="app">
+<div id="bg"></div>
+
+<!-- topbar -->
+<div id="topbar" class="hidden">
+  <button class="btn" onclick="App.goBack()">← <span id="back-label">뒤로</span></button>
+  <button class="btn" onclick="App.openSettings()">⚙</button>
+  <div style="margin-left:auto;display:flex;gap:7px">
+    <button class="btn" id="pip-toggle-btn" onclick="App.togglePip()" title="카메라">📷</button>
+    <button class="btn" id="pause-btn" onclick="App.togglePause()" style="display:none">⏸</button>
+  </div>
+</div>
+
+<!-- 1: 언어 선택 -->
+<div class="page active center-content" id="p1">
+  <video id="p1-video" autoplay loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0.7">
+    <source src="video/cockpitos-int.mp4" type="video/mp4">
+  </video>
+  <button id="p1-sound-btn" onclick="App.toggleP1Sound()" style="position:absolute;bottom:40px;right:16px;z-index:3;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.3);border-radius:50%;width:44px;height:44px;color:#fff;font-size:18px;cursor:pointer;touch-action:manipulation">🔇</button>
+  <div class="logo" style="position:relative;z-index:2">
+    <div class="logo-icon">✈</div>
+    <div class="logo-name">CockpitOS</div>
+    <div class="logo-sub">HI COCO! — AI FLIGHT INSTRUCTOR</div>
+  </div>
+  <div class="lang-grid" style="position:relative;z-index:2">
+    <div class="lang-btn" onclick="App.pickLang('ko')"><div class="flag">🇰🇷</div><div class="lname">한국어</div><div class="lsub">Korean</div></div>
+    <div class="lang-btn" onclick="App.pickLang('en')"><div class="flag">🇺🇸</div><div class="lname">English</div><div class="lsub">영어</div></div>
+    <div class="lang-btn" onclick="App.pickLang('ja')"><div class="flag">🇯🇵</div><div class="lname">日本語</div><div class="lsub">일본어</div></div>
+    <div class="lang-btn" onclick="App.pickLang('zh')"><div class="flag">🇨🇳</div><div class="lname">中文</div><div class="lsub">중국어</div></div>
+  </div>
+  <button class="guide-btn" onclick="App.showGuide()" style="position:relative;z-index:2">📖 App Guide</button>
+  <div class="powered" style="position:relative;z-index:2">POWERED BY ANTHROPIC CLAUDE · tutorbnb.com</div>
+</div>
+
+<!-- 2: 모드 선택 -->
+<div class="page" id="p2">
+  <div class="mode-title" id="p2-title">✈ CockpitOS</div>
+  <div class="mode-sub" id="p2-sub">어떤 비행을 하시겠어요?</div>
+  <!-- 여행/관광 카드 -->
+  <div class="mode-card gold" onclick="App.goTo('p3')" style="overflow:hidden">
+    <img src="images/backgrounds/서울항공사진.PNG" style="width:100%;height:120px;object-fit:cover;border-radius:14px;margin-bottom:10px;opacity:0.8">
+    <div class="mc-top"><span class="mc-icon">🟡</span><span class="mc-title" id="p2-beg">여행/관광</span></div>
+    <div class="mc-desc" id="p2-beg-d">버튼 하나로 서울, 제주 하늘을 비행합니다.</div>
+  </div>
+  <!-- 훈련생 카드 -->
+  <div class="mode-card" onclick="App.goTo('p4')" style="overflow:hidden">
+    <img src="images/backgrounds/3p_bg_settings_beginner.png" style="width:100%;height:120px;object-fit:cover;border-radius:14px;margin-bottom:10px;opacity:0.8">
+    <div class="mc-top"><span class="mc-icon">🔵</span><span class="mc-title" id="p2-stu">훈련생 모드</span></div>
+    <div class="mc-desc" id="p2-stu-d">항공 용어와 체크리스트 중심으로 실전에 가깝게 진행합니다.</div>
+  </div>
+  <!-- 시연 카드 -->
+  <div class="mode-card purple" onclick="App.goTo('p5')" style="overflow:hidden">
+    <img src="images/backgrounds/2p_plane.PNG" style="width:100%;height:120px;object-fit:cover;border-radius:14px;margin-bottom:10px;opacity:0.8">
+    <div class="mc-top"><span class="mc-icon">🚀</span><span class="mc-title" id="p2-demo">시연 모드</span></div>
+    <div class="mc-desc" id="p2-demo-d">투자자 PT용 시연 모드입니다.</div>
+  </div>
+  <!-- 앱 안내 -->
+  <button class="guide-btn" onclick="App.showGuide()" style="margin-top:16px">📖 App Guide</button>
+</div>
+
+<!-- 3: 원클릭 비행 선택 -->
+<div class="page" id="p3">
+  <video id="p3-video" autoplay loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0.75">
+    <source src="video/bigginer.mp4" type="video/mp4">
+  </video>
+  <div class="sel-title" id="p3-title" style="position:relative;z-index:2">원클릭 비행</div>
+  <div class="sel-sub" id="p3-sub" style="position:relative;z-index:2">어떻게 시작하시겠어요?</div>
+  <!-- 바로 날기 -->
+  <div class="sel-card amber" onclick="App.goTo('p311')" style="overflow:hidden;padding:0;position:relative;min-height:220px">
+    <img id="p3-card1-img" src="images/backgrounds/여행_카드1_한국어.png" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">
+    <div style="position:relative;z-index:2;padding:14px 18px;display:flex;flex-direction:column;justify-content:flex-end;min-height:220px;background:linear-gradient(transparent 60%,rgba(0,0,0,0.7) 100%)">
+      <div class="sc-title" style="color:#FFD060;font-size:18px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,0.8)" id="p3-simple">🟡 여행지 선택</div>
+      <div class="sc-desc" style="color:rgba(255,255,255,0.95);text-shadow:0 1px 4px rgba(0,0,0,0.8)" id="p3-simple-d">클릭 한번으로 여행지 하늘을 비행합니다.</div>
+    </div>
+  </div>
+  <!-- 여행객 비행배우기 -->
+  <div class="sel-card teal" onclick="App.goTo('p32')" style="overflow:hidden;padding:0;position:relative;min-height:220px">
+    <img src="images/backgrounds/계기설명 1  .png" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">
+    <div style="position:relative;z-index:2;padding:14px 18px;display:flex;flex-direction:column;justify-content:flex-end;min-height:220px;background:linear-gradient(transparent 60%,rgba(0,0,0,0.7) 100%)">
+      <div class="sc-title" style="color:#4ade80;font-size:18px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,0.8)" id="p3-edu">🟢 여행객 비행배우기</div>
+      <div class="sc-desc" style="color:rgba(255,255,255,0.95);text-shadow:0 1px 4px rgba(0,0,0,0.8)" id="p3-edu-d">1시간만에 비행배우기</div>
+    </div>
+  </div>
+</div>
+
+<!-- 3-1-1: 비행 설정 -->
+<div class="page" id="p311">
+  <div class="cfg-box">
+    <div class="cfg-title" id="p311-title">✈ 비행 설정</div>
+    <div class="cfg-section">
+      <div class="cfg-label" id="cfg-loc">📍 비행 지역</div>
+      <div class="cfg-btns">
+        <button class="cfg-btn active" id="cfg-seoul" onclick="App.setFlight('loc','seoul',this)">🏙 <span id="cfg-seoul-lbl">서울</span></button>
+        <button class="cfg-btn" id="cfg-jeju" onclick="App.setFlight('loc','jeju',this)">🏝 <span id="cfg-jeju-lbl">제주</span></button>
+      </div>
+    </div>
+    <div class="cfg-section">
+      <div class="cfg-label" id="cfg-time">🕐 비행 시간</div>
+      <div class="cfg-btns">
+        <button class="cfg-btn active" id="cfg-day" onclick="App.setFlight('time','day',this)">☀️ <span id="cfg-day-lbl">주간</span></button>
+        <button class="cfg-btn" id="cfg-night" onclick="App.setFlight('time','night',this)">🌃 <span id="cfg-night-lbl">야간</span></button>
+      </div>
+    </div>
+    <button class="cfg-start" id="cfg-go" onclick="App.startFlight()">🛫 비행 시작!</button>
+  </div>
+</div>
+
+<!-- 3-1-2: 비행 화면 -->
+<div class="page" id="p312" style="padding:60px 16px 200px;overflow-y:auto;align-items:center;justify-content:flex-start;background:#111">
+  <!-- 코코 소개 멘트 -->
+  <div style="text-align:center;margin-bottom:20px;max-width:500px">
+    <div id="p312-title" style="font-size:clamp(18px,4vw,26px);font-weight:900;color:#FFD700;margin-bottom:8px">🔌 개발 중인 기능</div>
+    <div style="font-size:clamp(12px,2.5vw,15px);color:rgba(255,255,255,0.8);line-height:1.6"><span id="p312-desc">시뮬레이터와 SimConnect가 연결되면 아래 기능들이 원클릭으로 작동합니다.</span></div>
+  </div>
+  <!-- 6장 카드 세로 배치 (스크롤) -->
+  <div style="display:flex;flex-direction:column;gap:14px;width:100%;max-width:500px">
+    <div class="feature-card-v" onclick="App.showFeatureDetail(0)"><div class="fc-label" id="fc0">1. 원클릭 출발 — 터치하면 상세 보기 ▶</div></div>
+    <div class="feature-card-v" onclick="App.showFeatureDetail(1)"><div class="fc-label" id="fc1">2. 실시간 가이드 — 터치하면 상세 보기 ▶</div></div>
+    <div class="feature-card-v" onclick="App.showFeatureDetail(2)"><div class="fc-label" id="fc2">3. 위험 경고 — 터치하면 상세 보기 ▶</div></div>
+    <div class="feature-card-v" onclick="App.showFeatureDetail(3)"><div class="fc-label" id="fc3">4. 타임머신 — 터치하면 상세 보기 ▶</div></div>
+    <div class="feature-card-v" onclick="App.showFeatureDetail(4)"><div class="fc-label" id="fc4">5. 착륙 가이드 — 터치하면 상세 보기 ▶</div></div>
+    <div class="feature-card-v" onclick="App.showFeatureDetail(5)"><div class="fc-label" id="fc5">6. 비행 리포트 — 터치하면 상세 보기 ▶</div></div>
+  </div>
+  <!-- 지금 체험 가능한 기능 -->
+  <div style="margin-top:20px;text-align:center;width:100%;max-width:500px">
+    <div style="font-size:clamp(14px,3vw,18px);font-weight:700;color:#4ade80;margin-bottom:12px"id="p312-try" >✅ 지금 바로 체험 가능한 기능</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button onclick="App.togglePip()" style="background:rgba(245,166,35,0.3);border:1.5px solid rgba(245,166,35,0.6);border-radius:14px;color:#FFD060;font-size:14px;font-weight:700;padding:14px 20px;cursor:pointer;font-family:inherit;min-width:100px"id="exp-cam">📷 카메라 AI</button>
+      <button onclick="App.toggleMic()" style="background:rgba(100,100,255,0.3);border:1.5px solid rgba(100,100,255,0.6);border-radius:14px;color:#93c5fd;font-size:14px;font-weight:700;padding:14px 20px;cursor:pointer;font-family:inherit;min-width:100px"id="exp-mic">🎤 음성 질문</button>
+      <button onclick="App.closeSettings();QuizEngine.start(App.lang)" style="background:rgba(34,197,94,0.3);border:1.5px solid rgba(34,197,94,0.6);border-radius:14px;color:#4ade80;font-size:14px;font-weight:700;padding:14px 20px;cursor:pointer;font-family:inherit;min-width:100px"id="exp-quiz">❓ 비행 퀴즈</button>
+    </div>
+  </div>
+  <div id="inst-overlay" style="display:none"></div>
+  <div id="tour-card" style="display:none"></div>
+  <div id="tour-ad" style="display:none"></div>
+</div>
+
+<!-- 3-2: 교육 후 비행 -->
+<div class="page" id="p32">
+  <div class="edu-header">
+    <div class="edu-title" id="p32-title">📚 교육 후 비행</div>
+    <div class="edu-sub" id="p32-sub">서랍을 열어서 공부하고 비행을 시작하세요</div>
+  </div>
+</div>
+
+<!-- 4: 훈련생 모드 -->
+<div class="page" id="p4">
+  <div class="trainee-wrap">
+    <div class="trainee-header">
+      <div style="font-size:36px;margin-bottom:8px">🔵</div>
+      <div class="trainee-title" id="p4-title">훈련생 모드</div>
+      <div class="trainee-sub" id="p4-sub">항공 용어와 체크리스트 중심으로 실전에 가깝게 진행합니다</div>
+    </div>
+    <div class="trainee-cards">
+      <div class="trainee-card" onclick="App.goTo('p41')">
+        <div class="tc-icon">📋</div>
+        <div class="tc-body">
+          <div class="tc-title" id="p4-preflight">비행 전 점검 (Pre-flight)</div>
+          <div class="tc-desc" id="p4-preflight-d">외부 점검부터 콕핏 셋업까지 실제 체크리스트 기반으로 학습합니다.</div>
+        </div>
+      </div>
+      <div class="trainee-card" onclick="App.goTo('p42')">
+        <div class="tc-icon">🛫</div>
+        <div class="tc-body">
+          <div class="tc-title" id="p4-taxi">지상 활주 & 이륙 (Taxi & Takeoff)</div>
+          <div class="tc-desc" id="p4-taxi-d">ATC 교신, 활주로 진입, 이륙 절차를 단계별로 연습합니다.</div>
+        </div>
+      </div>
+      <div class="trainee-card" onclick="App.goTo('p43')">
+        <div class="tc-icon">✈️</div>
+        <div class="tc-body">
+          <div class="tc-title" id="p4-cruise">순항 & 항법 (Cruise & Navigation)</div>
+          <div class="tc-desc" id="p4-cruise-d">VOR, GPS 항법과 고도/속도 유지 기법을 익힙니다.</div>
+        </div>
+      </div>
+      <div class="trainee-card" onclick="App.goTo('p44')">
+        <div class="tc-icon">🛬</div>
+        <div class="tc-body">
+          <div class="tc-title" id="p4-landing">접근 & 착륙 (Approach & Landing)</div>
+          <div class="tc-desc" id="p4-landing-d">ILS 접근, 시각 접근, 착륙 절차를 연습합니다.</div>
+        </div>
+      </div>
+      <div class="trainee-card" onclick="App.goTo('p45')">
+        <div class="tc-icon">⚠️</div>
+        <div class="tc-body">
+          <div class="tc-title" id="p4-emergency">비상 절차 (Emergency)</div>
+          <div class="tc-desc" id="p4-emergency-d">엔진 고장, 통신 두절 등 비상 상황 대응을 학습합니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4-1~4-5: 훈련생 상세 페이지 (공통 구조) -->
+<div class="page" id="p41">
+  <div class="edu-header">
+    <div class="edu-title" id="p41-title">📋 비행 전 점검</div>
+    <div class="edu-sub" id="p41-sub">서랍을 열어 체크리스트를 따라하세요</div>
+  </div>
+</div>
+<div class="page" id="p42">
+  <div class="edu-header">
+    <div class="edu-title" id="p42-title">🛫 지상 활주 & 이륙</div>
+    <div class="edu-sub" id="p42-sub">서랍을 열어 절차를 확인하세요</div>
+  </div>
+</div>
+<div class="page" id="p43">
+  <div class="edu-header">
+    <div class="edu-title" id="p43-title">✈️ 순항 & 항법</div>
+    <div class="edu-sub" id="p43-sub">서랍을 열어 항법을 학습하세요</div>
+  </div>
+</div>
+<div class="page" id="p44">
+  <div class="edu-header">
+    <div class="edu-title" id="p44-title">🛬 접근 & 착륙</div>
+    <div class="edu-sub" id="p44-sub">서랍을 열어 착륙 절차를 학습하세요</div>
+  </div>
+</div>
+<div class="page" id="p45">
+  <div class="edu-header">
+    <div class="edu-title" id="p45-title">⚠️ 비상 절차</div>
+    <div class="edu-sub" id="p45-sub">서랍을 열어 비상 절차를 학습하세요</div>
+  </div>
+</div>
+
+<!-- 5: 시연 모드 -->
+<div class="page" id="p5">
+  <div class="demo-wrap">
+    <div style="font-size:36px;margin-bottom:8px">🚀</div>
+    <div class="demo-title" id="p5-title">시연 모드</div>
+    <div class="demo-sub" id="p5-sub">투자자 및 심사위원을 위한 PT 데모입니다</div>
+    <div class="demo-cards">
+      <div class="demo-card" onclick="App.startDemoFlight()">
+        <div class="dc-icon">✈️</div>
+        <div class="dc-title" id="p5-fly">서울 상공 시연 비행</div>
+        <div class="dc-desc" id="p5-fly-d">계기를 탭하면 코코가 즉시 설명합니다</div>
+      </div>
+      <div class="demo-card" onclick="App.startDemoInstruments()">
+        <div class="dc-icon">🎛</div>
+        <div class="dc-title" id="p5-inst">계기판 교육 시연</div>
+        <div class="dc-desc" id="p5-inst-d">코코가 계기판을 하나씩 설명합니다</div>
+      </div>
+      <div class="demo-card" onclick="App.startDemoCamera()">
+        <div class="dc-icon">📷</div>
+        <div class="dc-title" id="p5-cam">카메라 AI 시연</div>
+        <div class="dc-desc" id="p5-cam-d">PIP 카메라로 계기를 촬영하면 AI가 분석합니다</div>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <button onclick="App.startAutoBriefing()" style="width:100%;background:rgba(245,166,35,0.9);border:none;border-radius:16px;color:#1a0800;font-size:16px;font-weight:900;padding:14px;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(245,166,35,0.3)"id="demo-briefing-btn">🎬 코코 자동 브리핑 시작</button>
+    </div>
+    <div class="demo-qr-section">
+      <button class="demo-qr-btn" onclick="App.showQR()"id="demo-qr-btn-lbl">📲 QR코드로 앱 체험하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 자동 브리핑 오버레이 -->
+<div id="briefing-overlay" style="display:none;position:fixed;inset:0;z-index:9998;background:#000;flex-direction:column;align-items:center;justify-content:center">
+  <button onclick="App.stopBriefing()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:12px;color:#fff;font-size:14px;font-weight:700;padding:8px 18px;cursor:pointer;z-index:211"id="br-close">✕ 종료</button>
+  <img id="briefing-bg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.25" src="">
+  <img id="briefing-coco" style="position:absolute;bottom:20px;left:20px;height:30vh;max-height:250px;z-index:212;transition:all 0.5s" src="">
+  <div id="briefing-card" style="position:relative;z-index:212;text-align:center;max-width:80%;padding:20px">
+    <div id="briefing-title" style="font-size:clamp(20px,4vw,36px);font-weight:900;color:#FFD700;margin-bottom:12px;text-shadow:0 2px 10px rgba(0,0,0,0.8)"></div>
+    <div id="briefing-text" style="font-size:clamp(14px,2.5vw,20px);color:#fff;line-height:1.6;text-shadow:0 2px 8px rgba(0,0,0,0.8)"></div>
+  </div>
+  <div style="position:absolute;bottom:20px;right:20px;display:flex;gap:8px;z-index:212">
+    <button onclick="App.briefingPrev()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;color:#fff;padding:8px 16px;cursor:pointer;font-size:14px"id="br-prev">◀ 이전</button>
+    <button onclick="App.briefingNext()" style="background:rgba(245,166,35,0.8);border:none;border-radius:10px;color:#1a0800;padding:8px 16px;cursor:pointer;font-size:14px;font-weight:700"id="br-next">다음 ▶</button>
+  </div>
+  <div id="briefing-progress" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:212"></div>
+</div>
+
+<!-- 코코 -->
+<img id="coco" src="" alt="Coco">
+
+<!-- 대화창 -->
+<div id="dialog">
+  <div id="dialog-box">
+    <div id="dialog-name">Coco</div>
+    <div id="dialog-text"><span id="dcontent"></span><span class="d-cursor"></span></div>
+  </div>
+</div>
+
+<!-- 서랍 -->
+<div id="drawer-bar">
+  <div class="drawer-btn" id="db1" onclick="App.openDrawer(1)"><div class="db-icon">🔍</div><div class="db-label" id="db1-lbl">궁금한 것</div></div>
+  <div class="drawer-btn" id="db2" onclick="App.openDrawer(2)"><div class="db-icon">🎬</div><div class="db-label" id="db2-lbl">영상 보기</div></div>
+  <div class="drawer-btn" id="db3" onclick="App.openDrawer(3)"><div class="db-icon">📋</div><div class="db-label" id="db3-lbl">뭐해야 하지?</div></div>
+  <div class="drawer-btn" id="db-mic" onclick="App.toggleMic()"><div class="db-icon">🎤</div><div class="db-label" id="db-mic-lbl">질문</div></div>
+</div>
+<div id="drawer-panel"><div class="drawer-content" id="drawer-content"></div></div>
+
+<!-- 마이크 -->
+<div id="mic-wrap">
+  <button id="tts-stop-btn" onclick="App.toggleTTSPause()" style="width:44px;height:44px;border-radius:50%;background:rgba(220,50,50,0.7);border:none;font-size:18px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;margin-bottom:14px">⏹</button>
+  <button id="mic-btn" onclick="App.toggleMic()">🎤</button>
+  <span id="mic-lbl">질문</span>
+</div>
+
+<!-- 소리박스 -->
+<div id="voice-box">
+  <div class="vb-header">
+    <span class="vb-status" id="vb-status">🎤 듣고 있어요 <span style="font-size:10px;color:rgba(255,255,255,0.3);margin-left:6px">✜ 드래그 이동</span></span>
+    <button class="vb-x" onclick="App.clearVoice()">✕</button>
+  </div>
+  <textarea id="voice-ta" placeholder="말씀하시거나 여기를 탭해서 직접 입력하세요"></textarea>
+  <div class="vb-btns">
+    <button class="vb-ask" onclick="App.askAI()">→ 코코에게 물어보기</button>
+    <button class="vb-done" onclick="App.closeMic()">마치기</button>
+  </div>
+</div>
+
+<!-- PIP -->
+<div id="pip-wrap">
+  <!-- 상단 버튼 -->
+  <button id="pip-close" onclick="App.closePip()">✕ 닫기</button>
+  <button id="pip-flip" onclick="App.flipCam()" style="position:absolute;top:14px;left:14px;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.3);border-radius:12px;color:#fff;font-size:16px;padding:12px 18px;cursor:pointer;z-index:90;min-height:52px">🔄 전환</button>
+  <!-- 카메라 영상 -->
+  <video id="pip-video" autoplay playsinline muted></video>
+  <!-- 제스처 안내 오버레이 -->
+  <div id="pip-gesture-guide" style="display:none;position:absolute;top:60px;left:50%;transform:translateX(-50%);z-index:84;background:rgba(0,0,0,0.8);border:1px solid rgba(255,215,0,0.4);border-radius:16px;padding:16px 24px;pointer-events:auto">
+    <div style="display:flex;gap:24px;margin-bottom:10px">
+      <div style="text-align:center"><div style="font-size:36px">✊</div><div style="color:#FFD700;font-size:12px;font-weight:700;margin-top:2px" id="gesture-fist-lbl">비행 멈춤</div></div>
+      <div style="text-align:center"><div style="font-size:36px">🖐</div><div style="color:#4ade80;font-size:12px;font-weight:700;margin-top:2px" id="gesture-palm-lbl">질문하기</div></div>
+      <div style="text-align:center"><div style="font-size:36px">✌️</div><div style="color:#60a5fa;font-size:12px;font-weight:700;margin-top:2px" id="gesture-peace-lbl">스크린샷</div></div>
+    </div>
+    <div style="color:rgba(255,255,255,0.5);font-size:11px;text-align:center" id="gesture-hint">카메라에 손동작을 보여주세요 (준비 중)</div>
+    <button onclick="App.hideGestureGuide(true)" style="display:block;margin:8px auto 0;background:none;border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(255,255,255,0.4);font-size:10px;padding:4px 12px;cursor:pointer"id="gesture-dismiss">다시 보지 않기</button>
+  </div>
+  <!-- 타임머신 이벤트 오버레이 -->
+  <div id="pip-timemachine" style="display:none;position:absolute;inset:0;z-index:86;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;flex-direction:column">
+    <div style="font-size:64px;animation:pulse 1s ease-in-out infinite">⏮</div>
+    <div id="tm-title" style="font-size:clamp(18px,4vw,28px);font-weight:900;color:#FFD700;margin-top:10px">타임머신 작동!</div>
+    <div id="tm-desc" style="font-size:14px;color:rgba(255,255,255,0.7);margin-top:6px">출발 위치로 되돌아갑니다</div>
+  </div>
+  <!-- 비행 멈춤 이벤트 오버레이 -->
+  <div id="pip-flightstop" style="display:none;position:absolute;inset:0;z-index:86;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;flex-direction:column">
+    <div style="font-size:64px;animation:pulse 1s ease-in-out infinite">⏸</div>
+    <div id="fs-title" style="font-size:clamp(18px,4vw,28px);font-weight:900;color:#FFD700;margin-top:10px">비행 멈춤</div>
+    <div id="fs-desc" style="font-size:14px;color:rgba(255,255,255,0.7);margin-top:6px">천천히 살펴보세요</div>
+  </div>
+  <!-- 포커스 사각형 (드래그 이동 가능) -->
+  <div id="pip-focus" style="display:none">
+    <div id="pip-focus-box"></div>
+    <div id="pip-focus-label">여기를 이동 → 📷 캡처</div>
+  </div>
+  <!-- 캡처 결과 오버레이 — 텍스트는 JS에서 언어별 설정 -->
+  <div id="pip-capture-result" style="display:none">
+    <canvas id="pip-capture-canvas"></canvas>
+    <div id="pip-capture-info">
+      <div id="pip-capture-question" style="font-size:14px;color:#FFD060;font-weight:700;margin-bottom:8px"></div>
+      <div id="pip-capture-answer" style="font-size:13px;color:#fff;line-height:1.5;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;justify-content:center">
+      <button id="pip-tts-toggle" onclick="App.togglePipTTS()" style="background:rgba(220,50,50,0.3);border:1px solid rgba(220,50,50,0.6);border-radius:10px;color:#ff9090;padding:8px 14px;font-size:13px;cursor:pointer"></button>
+      <button id="pip-retake-btn" onclick="App.closeCaptureResult()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;color:#fff;padding:8px 14px;font-size:13px;cursor:pointer"></button>
+      <button id="pip-askmore-btn" onclick="App.pipAskMore()" style="background:rgba(245,166,35,0.3);border:1px solid rgba(245,166,35,0.6);border-radius:10px;color:#FFD060;padding:8px 14px;font-size:13px;cursor:pointer"></button>
+    </div>
+    <div id="pip-ask-box" style="display:none;margin-top:10px;width:100%;max-width:400px">
+      <textarea id="pip-ask-ta" style="width:100%;min-height:50px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:14px;padding:10px;resize:vertical;font-family:inherit;outline:none"></textarea>
+      <button id="pip-send-btn" onclick="App.pipSendQuestion()" style="width:100%;margin-top:6px;background:#F5A623;border:none;border-radius:10px;color:#1a0800;font-size:14px;font-weight:700;padding:10px;cursor:pointer;font-family:inherit"></button>
+    </div>
+  </div>
+  <!-- 우측 플로팅 버튼: 찍어서 묻기 + 마이크 -->
+  <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);z-index:85;display:flex;flex-direction:column;gap:12px;align-items:center">
+    <button onclick="App.startCapture()" id="pip-capture-btn" style="width:72px;height:72px;border-radius:18px;background:rgba(245,166,35,0.9);border:none;font-size:14px;font-weight:700;color:#1a0800;cursor:pointer;box-shadow:0 4px 14px rgba(245,166,35,0.4);touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:inherit"><span style="font-size:24px">📷</span><span id="pip-cap-lbl">캡처</span></button>
+    <button onclick="App.toggleMic()" style="width:72px;height:72px;border-radius:18px;background:rgba(100,100,255,0.8);border:none;font-size:14px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(100,100,255,0.3);touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:inherit"><span style="font-size:24px">🎤</span><span id="pip-mic-lbl">질문</span></button>
+  </div>
+  <!-- 하단 버튼바: 시뮬 제어 -->
+  <div id="pip-bar">
+    <button class="pip-btn red" onclick="App.confirmSimAction('reset')">⏮ 되돌리기</button>
+    <button class="pip-btn gold" onclick="App.confirmSimAction('pause')">⏸ 비행 멈춤</button>
+    <button class="pip-btn" id="pip-sim-confirm" onclick="App.executeSimAction()" style="display:none">✅ 실행</button>
+  </div>
+</div>
+
+<!-- PAUSED -->
+<div id="pause-overlay" onclick="App.togglePause()">
+  <div id="pause-text">✊ PAUSED</div>
+  <div id="pause-hint">▶ 화면 터치 → 계속</div>
+</div>
+
+<!-- 이미지 뷰어 -->
+<div id="img-viewer">
+  <button id="iv-close" onclick="App.closeImgViewer()">← 돌아가기</button>
+  <img id="iv-img" src="" alt="">
+  <div id="iv-caption"></div>
+</div>
+
+<!-- 앱 안내 -->
+<div id="guide-overlay">
+  <div class="guide-box">
+    <div class="guide-title" id="guide-title">📖 앱 사용 안내</div>
+    <div class="guide-item"><div class="gi-icon">✊</div><div><div class="gi-title" id="g1t">주먹 = 비행 멈춤</div><div class="gi-desc" id="g1d">PIP 카메라가 켜진 상태에서 주먹을 쥐면 비행이 멈춥니다.</div></div></div>
+    <div class="guide-item"><div class="gi-icon">🖐</div><div><div class="gi-title" id="g2t">손 펼치기 = 질문</div><div class="gi-desc" id="g2d">손바닥을 펼치면 코코에게 질문할 수 있습니다.</div></div></div>
+    <div class="guide-item"><div class="gi-icon">📷</div><div><div class="gi-title" id="g3t">카메라로 계기 촬영</div><div class="gi-desc" id="g3d">PIP창을 열고 계기판을 비추면 코코가 설명해드립니다.</div></div></div>
+    <div class="guide-item"><div class="gi-icon">⏮</div><div><div class="gi-title" id="g4t">되돌리기 버튼</div><div class="gi-desc" id="g4d">PIP창 안에 있습니다. 비행기를 처음 위치로 되돌립니다.</div></div></div>
+    <button class="guide-close" id="guide-ok" onclick="App.closeGuide()">확인했습니다</button>
+  </div>
+</div>
+
+<!-- 설정 -->
+<!-- 설정 패널 -->
+  <div id="settings-panel" class="panel">
+    <div class="panel-scroll">
+      <div class="phdr"><span class="ptitle" id="s-title">⚙ 설정</span><button class="pclose" data-action="close-settings" id="s-close">닫기</button></div>
+      <!-- 공유/QR/라운지 버튼 행 -->
+      <div class="host-section" style="display:flex;gap:8px;padding:8px 0;flex-wrap:wrap">
+        <button class="host-btn" data-action="share-app" style="flex:1;min-width:80px">
+          <span class="icon">🔗</span><span class="label" id="s-share">공유하기</span>
+        </button>
+        <button class="host-btn" data-action="show-qr" style="flex:1;min-width:80px">
+          <span class="icon">📲</span><span class="label" id="s-qr">QR코드</span>
+        </button>
+        <button class="host-btn" data-action="open-lounge" style="flex:1;min-width:80px">
+          <span class="icon">☕</span><span class="label">Lounge</span>
+        </button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;margin-bottom:10px">
+        <span style="font-size:14px;font-weight:600;color:#fff"id="s-lang-title">🌐 언어</span>
+        <span style="font-size:13px;color:#F5A623;font-weight:600" id="cur-lang">한국어</span>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin:-6px 0 10px 14px"id="s-lang-note">첫 화면에서 변경 가능</div>
+      <div class="acc-section" id="acc-voice">
+        <div class="acc-header" data-action="toggle-acc" data-acc="acc-voice"><span class="acc-title"id="s-voice-title">🔊 음성(TTS)</span><span style="display:flex;align-items:center;gap:6px"><span class="acc-current" id="cur-voice">켜짐</span><span class="acc-arrow">▾</span></span></div>
+        <div class="acc-body">
+          <div class="sel-card picked" id="tts-on" data-action="voice-on"><div class="sel-radio"><div class="sel-dot"></div></div><div class="sel-name" id="s-tts-on">켜짐</div></div>
+          <div class="sel-card" id="tts-off" data-action="voice-off"><div class="sel-radio"><div class="sel-dot"></div></div><div class="sel-name" id="s-tts-off">꺼짐</div></div>
+        </div>
+      </div>
+      <!-- 마이크 설정 -->
+      <div class="acc-section" id="acc-mic">
+        <div class="acc-header" data-action="toggle-acc" data-acc="acc-mic"><span class="acc-title"id="s-mic-title">🎤 마이크(음성인식)</span><span style="display:flex;align-items:center;gap:6px"><span class="acc-current" id="cur-mic">켜짐</span><span class="acc-arrow">▾</span></span></div>
+        <div class="acc-body">
+          <div class="sel-card picked" id="mic-on" data-action="mic-on"><div class="sel-radio"><div class="sel-dot"></div></div><div class="sel-name" id="s-mic-on">켜짐</div></div>
+          <div class="sel-card" id="mic-off" data-action="mic-off"><div class="sel-radio"><div class="sel-dot"></div></div><div class="sel-name" id="s-mic-off">꺼짐</div></div>
+          <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px">
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px"id="s-mic-display">마이크 표시창</div>
+            <div class="sel-card picked" id="mic-display-on" data-action="mic-display-on"><div class="sel-radio"><div class="sel-dot"></div></div><div class="sel-name" id="s-disp-on">표시</div></div>
+            <div class="sel-card" id="mic-display-off" data-action="mic-display-off"><div class="sel-radio"><div class="sel-dot"></div></div><div class="sel-name" id="s-disp-off">숨김</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- 제스처 설정 -->
+      <div class="acc-section" id="acc-gesture">
+        <div class="acc-header" data-action="toggle-acc" data-acc="acc-gesture"><span class="acc-title"id="s-gesture-title">✋ 제스처 인식</span><span style="display:flex;align-items:center;gap:6px"><span class="acc-current" id="cur-gesture">켜짐</span><span class="acc-arrow">▾</span></span></div>
+        <div class="acc-body">
+          <div class="sel-card picked" id="gesture-on" data-action="gesture-on"><div class="sel-radio"><div class="sel-dot"></div></div><div class="sel-name" id="s-gest-on">켜짐 (주먹/보자기/가위)</div></div>
+          <div class="sel-card" id="gesture-off" data-action="gesture-off"><div class="sel-radio"><div class="sel-dot"></div></div><div class="sel-name" id="s-gest-off">꺼짐 (CPU 절약)</div></div>
+        </div>
+      </div>
+      <!-- 호스트 모드 -->
+      <div style="margin-top:10px;padding:12px;background:rgba(100,60,0,0.15);border:1px solid rgba(245,166,35,0.2);border-radius:12px;cursor:pointer;touch-action:manipulation" data-action="open-host">
+        <div style="font-size:14px;font-weight:600;color:#F5A623;margin-bottom:2px"id="s-host-title">🎓 호스트 모드</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4)"id="s-host-desc">시연 / 광고 설정</div>
+      </div>
+      <!-- AI 교관 설정 -->
+      <div style="margin-top:10px;padding:13px 15px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px">
+        <div style="font-size:14px;font-weight:700;color:#F5A623;margin-bottom:8px"id="s-ai-title">🤖 AI 교관 음성 응답</div>
+        <button class="host-btn" id="qa-mode-btn" data-action="toggle-qa">
+          <span class="icon">🟢</span>
+          <span class="label" id="qa-mode-label">AI 교관 ON</span>
+        </button>
+        <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:6px"id="s-ai-desc">ON: 음성 질문에 AI가 즉석 답변 / OFF: AI 침묵</p>
+        <!-- API 키 입력창 — 잠금 기능 포함 -->
+        <div style="margin-top:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:10px" id="api-key-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-size:11px;color:rgba(255,255,255,0.5)"id="s-api-label">🔑 API 키 <span id="api-key-status" style="color:#4ade80">미입력</span></div>
+            <span class="api-lock-badge locked" id="api-lock-badge" onclick="ApiLock.toggle()">🔒 잠김</span>
+          </div>
+          <div style="display:flex;gap:6px">
+            <input id="api-key-input" type="password" placeholder="sk-ant-api03-..."
+              style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:6px 10px;font-size:11px;font-family:monospace;outline:none;min-width:0">
+            <button id="api-save-btn" data-action="save-api-key"
+              style="background:rgba(245,166,35,0.3);border:1px solid rgba(245,166,35,0.6);border-radius:8px;color:#FFD060;font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer;touch-action:manipulation;white-space:nowrap"id="s-api-save">저장</button>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px"id="s-api-note">이 기기 브라우저에만 저장됩니다.</div>
+        </div>
+      </div>
+      <!-- 시뮬레이터 연동 -->
+      <div style="margin-top:10px;padding:13px 15px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px">
+        <div style="font-size:14px;font-weight:700;color:#F5A623;margin-bottom:8px"id="s-sim-title">🔌 시뮬레이터 연동 <span style="font-size:10px;background:rgba(245,166,35,0.2);border:1px solid rgba(245,166,35,0.4);border-radius:8px;padding:2px 8px;color:#F5A623">준비 중</span></div>
+        <div id="simconnect-status" style="font-size:12px;color:rgba(255,255,255,0.4);padding:4px 0">SimConnect (비행 상태) + SimBrief (비행 계획) 연동 예정</div>
+        <div style="margin-top:10px">
+          <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:6px"id="s-airport-title">🛫 출발 공항 설정</div>
+          <select id="airport-select" onchange="App.setAirport && App.setAirport(this.value)"
+            style="width:100%;background:#1a1f2e;border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:8px 10px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer">
+            <option value="RKSI" style="background:#1a1f2e;color:#fff">인천국제공항 (RKSI)</option>
+            <option value="RKSS" style="background:#1a1f2e;color:#fff">김포국제공항 (RKSS)</option>
+            <option value="RKPC" style="background:#1a1f2e;color:#fff">제주국제공항 (RKPC)</option>
+            <option value="RKPK" style="background:#1a1f2e;color:#fff">김해국제공항 (RKPK)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API 키 잠금 해제 모달 -->
+  <div id="lock-modal">
+    <div id="lock-modal-inner">
+      <h3>🔒 API 키 잠금 해제</h3>
+      <input id="lock-pin-input" type="password" maxlength="6" placeholder="• • • •" inputmode="numeric">
+      <div id="lock-pin-error"></div>
+      <button class="lock-modal-btn confirm" onclick="ApiLock.confirm()">확인</button>
+      <button class="lock-modal-btn cancel" onclick="ApiLock.closeModal()">취소</button>
+      <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:8px">PIN을 잊으셨나요? localStorage 초기화 후 재설정 가능합니다.</div>
+    </div>
+  </div>
+
+<!-- 호스트 패널 -->
+<div id="host-panel" class="panel">
+  <div class="panel-scroll">
+    <div class="phdr"><span class="ptitle" id="h-title">🎓 호스트 모드</span><button class="pclose" data-action="close-host" id="h-close">닫기</button></div>
+    <div class="host-section">
+      <div class="host-section-title" id="h-content">📤 콘텐츠 관리 <span style="font-size:10px;background:rgba(245,166,35,0.2);border:1px solid rgba(245,166,35,0.4);border-radius:8px;padding:2px 8px;color:#F5A623">v1.1</span></div>
+      <button class="host-btn" data-action="v11-placeholder"><span class="icon">📷</span><span class="label" id="h-photo">사진 업로드</span><span class="tag" id="h-tag1">준비중</span></button>
+      <button class="host-btn" data-action="v11-placeholder"><span class="icon">🎬</span><span class="label" id="h-video">동영상 업로드</span><span class="tag" id="h-tag2">준비중</span></button>
+    </div>
+    <div class="host-section">
+      <div class="host-section-title"id="h-demo-title">🎤 시연 모드 <span style="font-size:10px;background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.4);border-radius:8px;padding:2px 8px;color:#4ade80">MVP</span></div>
+      <button class="host-btn" data-action="start-pitch"><span class="icon">🚀</span><span class="label" id="h-pitch">코코 브리핑 시작</span></button>
+      <button class="host-btn" data-action="toggle-pip-fullscreen"><span class="icon">📷</span><span class="label" id="h-cam">카메라 전체화면</span></button>
+      <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px"id="h-pitch-desc">심사위원/투자자 시연용</p>
+    </div>
+    <div class="host-section">
+      <div class="host-section-title"id="h-ad-title">🎯 광고 데모 <span style="font-size:10px;background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.4);border-radius:8px;padding:2px 8px;color:#4ade80"id="h-demo-tag">시연용</span></div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:8px"id="h-ad-desc">심사장 시연 시 지역 광고를 직접 실행합니다</p>
+      <button class="host-btn" data-action="demo-ad" data-landmark="seoul_lotte"><span class="icon">🗼</span><span class="label" id="h-ad1">서울 잠실 롯데타워</span></button>
+      <button class="host-btn" data-action="demo-ad" data-landmark="jeju_island"><span class="icon">🌊</span><span class="label" id="h-ad2">제주도 상공</span></button>
+      <button class="host-btn" data-action="demo-ad" data-landmark="busan_haeundae"><span class="icon">🦞</span><span class="label" id="h-ad3">부산 해운대</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- 갤러그 -->
+<div id="galaga-overlay" style="display:none;position:fixed;inset:0;z-index:300;background:#000;align-items:center;justify-content:center;flex-direction:column">
+  <button onclick="GalagaEngine.stop()" style="position:fixed;top:14px;right:14px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:12px;color:#fff;font-size:14px;font-weight:700;padding:8px 18px;cursor:pointer;z-index:301">✕ 나가기</button>
+  <canvas id="galaga-canvas" style="display:block;image-rendering:pixelated"></canvas>
+  <div style="margin-top:10px;color:rgba(255,255,255,0.4);font-size:11px">터치: 이동 | 탭: 발사 | PC: ←→ + Space</div>
+</div>
+
+<!-- 라운지 패널 -->
+<div id="lounge-panel" class="panel">
+  <div style="width:90%;max-width:460px;margin:auto;background:rgba(10,15,28,0.97);border:1px solid rgba(245,166,35,0.5);border-radius:22px;padding:28px 24px;position:relative;color:#fff">
+    <button data-action="close-lounge" style="position:absolute;top:14px;right:18px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:22px;cursor:pointer">✕</button>
+    <h2 style="color:#F5A623;margin:0 0 6px;font-size:20px"id="lounge-title">👨‍✈️ Pilot Lounge</h2>
+    <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.6;margin-bottom:22px"id="lounge-desc">비행 전 잠시 머리를 식히세요.<br>준비된 콘텐츠가 곧 업데이트됩니다.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+      <div data-action="lounge-quiz" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:20px;border-radius:16px;text-align:center;cursor:pointer;touch-action:manipulation">
+        <div style="font-size:28px;margin-bottom:8px">❓</div>
+        <div style="font-size:13px;font-weight:600">Flight Quiz</div>
+        <div style="font-size:10px;color:rgba(34,197,94,0.8);margin-top:3px"id="lounge-quiz-tag">도전하기 ▶</div>
+      </div>
+      <div onclick="App.closeLounge();GalagaEngine.start()" style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.3);padding:20px;border-radius:16px;text-align:center;cursor:pointer;touch-action:manipulation">
+        <div style="font-size:28px;margin-bottom:8px">🚀</div>
+        <div style="font-size:13px;font-weight:600"id="lounge-galaga">갤러그</div>
+        <div style="font-size:10px;color:rgba(245,166,35,0.6);margin-top:3px"id="lounge-galaga-tag">추억의 게임 ▶</div>
+      </div>
+    </div>
+    <div style="background:rgba(245,166,35,0.07);border:1px solid rgba(245,166,35,0.3);border-radius:14px;padding:14px 16px">
+      <div style="font-size:13px;font-weight:600;color:#F5A623;margin-bottom:6px"id="lounge-share-title">🔗 조종석 공유하기</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:10px"id="lounge-share-desc">지인에게 내 조종석 주소를 공유해보세요</div>
+      <button data-action="share-app" style="width:100%;background:#F5A623;border:none;border-radius:10px;color:#1a0a00;font-size:13px;font-weight:700;padding:10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif"id="lounge-share-btn">🔗 주소 공유하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 광고 -->
+<div id="ad-overlay">
+  <button id="ad-x" onclick="this.parentElement.classList.remove('show')">✕</button>
+  <div id="ad-content"></div>
+</div>
+
+<!-- 토스트 -->
+<div id="toast"></div>
+
+<script src="data.js?v=20260429"></script>
+    <script src="script.js?v=20260429"></script>
+</body>
+</html><!-- cache bust Sun Apr  5 02:57:25     2026 -->
