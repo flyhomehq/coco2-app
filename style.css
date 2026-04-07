@@ -303,6 +303,17 @@ body{font-family:'Noto Sans KR',sans-serif;background:#050a14;color:#fff;overflo
   /* 휴대폰: 배경을 거의 검게 → 카드 가시성 확보 */
   #bg::after{background:rgba(0,0,0,0.85)!important}
   #coco{height:15vh;max-height:105px;left:12%}
+  /* 휴대폰: p1 로고+버튼 아래로 내리기 */
+  #p1.center-content{justify-content:flex-end!important;padding-bottom:60px!important}
+  .logo{margin-bottom:20px!important}
+  .logo-icon{font-size:32px!important}
+  .logo-name{font-size:24px!important}
+  .logo-sub{font-size:10px!important}
+  .lang-grid{max-width:280px!important;gap:8px!important}
+  .lang-btn{padding:12px 8px!important;background:rgba(8,16,36,0.7)!important;border-color:rgba(255,255,255,0.25)!important}
+  .lang-btn .flag{font-size:20px!important;margin-bottom:2px!important}
+  .lang-btn .lname{font-size:13px!important}
+  .lang-btn .lsub{font-size:9px!important}
   /* 휴대폰 세로: p3 카드 — 정사각형 2개 나란히 */
   #p3 .sel-card-wrap{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:340px;margin-top:30vh}
   .sel-card{min-height:auto!important;max-height:none!important;margin-bottom:0!important;padding:0!important;aspect-ratio:1/1}
@@ -317,8 +328,18 @@ body{font-family:'Noto Sans KR',sans-serif;background:#050a14;color:#fff;overflo
   /* 테블릿: 배경을 좀 더 어둡게 */
   #bg::after{background:linear-gradient(to bottom,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.7) 100%)!important}
 }
-/* 휴대폰 가로 모드: p3 카드도 작게 */
+/* 휴대폰 가로 모드 */
 @media (orientation:landscape) and (max-height:500px) {
+  /* p1: 로고+버튼 오른쪽으로 */
+  #p1.center-content{justify-content:center!important;padding-bottom:20px!important}
+  .logo{margin-bottom:10px!important}
+  .logo-icon{font-size:28px!important}
+  .logo-name{font-size:20px!important}
+  .lang-grid{max-width:280px!important;gap:6px!important}
+  .lang-btn{padding:8px 6px!important;background:rgba(8,16,36,0.7)!important}
+  .lang-btn .flag{font-size:18px!important}
+  .lang-btn .lname{font-size:12px!important}
+  /* p3: 카드 작게 */
   #p3 .sel-card-wrap{display:grid!important;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:340px;margin-top:10px}
   .sel-card{min-height:auto!important;max-height:none!important;margin-bottom:0!important;padding:0!important;aspect-ratio:1/1}
   .sel-card img{display:none!important}
