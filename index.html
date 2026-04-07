@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#050a14">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20260439">
+<link rel="stylesheet" href="style.css?v=20260440">
 </head>
 <body>
 <div id="app">
@@ -124,6 +124,19 @@
 
 <!-- 3-1-2: 비행 화면 -->
 <div class="page" id="p312" style="padding:60px 16px 200px;overflow-y:auto;align-items:center;justify-content:flex-start;background:#111">
+  <!-- 투어 배경/상태 (SimConnect 연동 시 사용) -->
+  <img id="tour-bg" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.3" src="">
+  <img id="tour-preview" style="display:none" src="">
+  <div id="tour-overlay" style="display:none;position:absolute;inset:0;z-index:3;align-items:center;justify-content:center"><div id="tour-overlay-text"></div></div>
+  <div style="display:none;position:fixed;top:55px;left:0;right:0;z-index:15;padding:0 12px;display:flex;gap:6px;flex-wrap:wrap">
+    <span id="tour-alt" style="font-size:11px;color:#4ade80;background:rgba(0,0,0,0.6);padding:2px 8px;border-radius:8px"></span>
+    <span id="tour-spd" style="font-size:11px;color:#60a5fa;background:rgba(0,0,0,0.6);padding:2px 8px;border-radius:8px"></span>
+    <span id="tour-loc" style="font-size:11px;color:#FFD060;background:rgba(0,0,0,0.6);padding:2px 8px;border-radius:8px"></span>
+    <span id="sim-status" style="font-size:11px;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.6);padding:2px 8px;border-radius:8px"></span>
+  </div>
+  <!-- 캐러셀 (기능 소개) -->
+  <div id="feature-carousel" style="display:none"></div>
+  <div id="feature-dots" style="display:none;position:fixed;bottom:200px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:15"></div>
   <!-- 코코 소개 멘트 -->
   <div style="text-align:center;margin-bottom:20px;max-width:500px">
     <div id="p312-title" style="font-size:clamp(18px,4vw,26px);font-weight:900;color:#FFD700;margin-bottom:8px">🔌 개발 중인 기능</div>
@@ -148,8 +161,15 @@
     </div>
   </div>
   <div id="inst-overlay" style="display:none"></div>
-  <div id="tour-card" style="display:none"></div>
-  <div id="tour-ad" style="display:none"></div>
+  <div id="tour-card" style="display:none;position:fixed;bottom:90px;left:10px;right:10px;z-index:14;background:rgba(5,9,24,0.95);border:1.5px solid rgba(245,166,35,0.3);border-radius:16px;padding:12px 16px;backdrop-filter:blur(14px)">
+    <div id="tour-card-title" style="font-size:16px;font-weight:700;color:#FFD700;margin-bottom:4px"></div>
+    <div id="tour-card-desc" style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.5"></div>
+  </div>
+  <div id="tour-ad" style="display:none;position:fixed;bottom:180px;right:10px;z-index:14;background:rgba(5,9,24,0.95);border:1.5px solid rgba(100,200,255,0.3);border-radius:14px;padding:10px;max-width:200px;backdrop-filter:blur(14px)">
+    <img id="tour-ad-img" style="width:100%;border-radius:10px;margin-bottom:6px" src="">
+    <div id="tour-ad-title" style="font-size:12px;font-weight:700;color:#60a5fa"></div>
+    <div id="tour-ad-desc" style="font-size:11px;color:rgba(255,255,255,0.6)"></div>
+  </div>
 </div>
 
 <!-- 3-2: 교육 후 비행 -->

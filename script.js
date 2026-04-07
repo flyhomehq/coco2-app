@@ -1536,8 +1536,8 @@ const App = {
 
       if (!res.ok) {
         const err = await res.json();
-        document.getElementById('pip-capture-question').textContent = '❌ 분석 실패';
-        document.getElementById('pip-capture-answer').textContent = err?.error?.message || 'AI 연결 오류';
+        document.getElementById('pip-capture-question').textContent = {ko:'❌ 분석 실패',en:'❌ Analysis failed',ja:'❌ 分析失敗',zh:'❌ 分析失败'}[this.lang];
+        document.getElementById('pip-capture-answer').textContent = err?.error?.message || {ko:'AI 연결 오류',en:'AI connection error',ja:'AI接続エラー',zh:'AI连接错误'}[this.lang];
         return;
       }
 
@@ -1556,7 +1556,7 @@ const App = {
       this._say(answer);
 
     } catch(e) {
-      document.getElementById('pip-capture-question').textContent = '❌ 연결 오류';
+      document.getElementById('pip-capture-question').textContent = {ko:'❌ 연결 오류',en:'❌ Connection error',ja:'❌ 接続エラー',zh:'❌ 连接错误'}[this.lang];
       document.getElementById('pip-capture-answer').textContent = e.message;
     }
   },
@@ -1604,7 +1604,7 @@ const App = {
     const txt = document.getElementById('pip-ask-ta').value.trim();
     if (!txt) return;
     document.getElementById('pip-ask-ta').value = '';
-    document.getElementById('pip-capture-question').textContent = '🔍 추가 질문 분석 중...';
+    document.getElementById('pip-capture-question').textContent = {ko:'🔍 추가 질문 분석 중...',en:'🔍 Analyzing...',ja:'🔍 追加質問分析中...',zh:'🔍 正在分析追加问题...'}[this.lang];
     document.getElementById('pip-capture-answer').textContent = '';
 
     // 캡처 이미지와 함께 추가 질문
@@ -1639,7 +1639,7 @@ const App = {
       document.getElementById('pip-capture-answer').textContent = answer;
       this._say(answer);
     } catch(e) {
-      document.getElementById('pip-capture-answer').textContent = '연결 오류: ' + e.message;
+      document.getElementById('pip-capture-answer').textContent = ({ko:'연결 오류: ',en:'Connection error: ',ja:'接続エラー: ',zh:'连接错误: '}[this.lang]) + e.message;
     }
   },
 
@@ -1837,7 +1837,8 @@ const App = {
     this.ttsOn = on;
     document.getElementById('tts-on')?.classList.toggle('picked', on);
     document.getElementById('tts-off')?.classList.toggle('picked', !on);
-    document.getElementById('cur-voice').textContent = on ? '켜짐' : '꺼짐';
+    const onOff = {ko:['켜짐','꺼짐'],en:['ON','OFF'],ja:['ON','OFF'],zh:['开','关']}[this.lang]||['켜짐','꺼짐'];
+    document.getElementById('cur-voice').textContent = on ? onOff[0] : onOff[1];
     if (!on) window.speechSynthesis.cancel();
   },
 
@@ -1845,8 +1846,9 @@ const App = {
     this.gestureOn = on;
     document.getElementById('gesture-on')?.classList.toggle('picked', on);
     document.getElementById('gesture-off')?.classList.toggle('picked', !on);
-    document.getElementById('cur-gesture').textContent = on ? '켜짐' : '꺼짐';
-    this.toast(on ? '✋ 제스처 켜짐' : '✋ 제스처 꺼짐');
+    const onOff = {ko:['켜짐','꺼짐'],en:['ON','OFF'],ja:['ON','OFF'],zh:['开','关']}[this.lang]||['켜짐','꺼짐'];
+    document.getElementById('cur-gesture').textContent = on ? onOff[0] : onOff[1];
+    this.toast(on ? '✋ ' + onOff[0] : '✋ ' + onOff[1]);
   },
 
   // TTS 완전 중단 (마이크 옆 버튼) — pause/resume 대신 cancel 사용
