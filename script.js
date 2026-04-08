@@ -725,8 +725,17 @@ const App = {
     window.speechSynthesis.cancel();
     clearInterval(this._dialogTimer);
 
-    // HUD + 과정 표시 정리
-    if (typeof FlightHUD !== 'undefined') FlightHUD.stopFlight();
+    // HUD 화면에서 뒤로가면 → HUD만 닫고 과정 표시로 복귀
+    if (typeof FlightHUD !== 'undefined' && FlightHUD.flightActive) {
+      FlightHUD.stopFlight();
+      const hud = document.getElementById('flight-hud');
+      if (hud) hud.style.display = 'none';
+      // 과정 표시가 있으면 다시 보여주기
+      if (typeof FlightProcess !== 'undefined' && FlightProcess._overlayEl) {
+        FlightProcess._overlayEl.style.display = 'flex';
+        return; // 페이지 전환 안 함, 과정 표시로 복귀
+      }
+    }
     if (typeof FlightProcess !== 'undefined') FlightProcess.stop();
 
     // p312 원래 UI 복원

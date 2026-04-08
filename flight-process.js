@@ -67,6 +67,8 @@ const FlightProcess = {
   // ── 과정 중지 ──
   stop() {
     if (this._processTimer) clearTimeout(this._processTimer);
+    this._processTimer = null;
+    window.speechSynthesis.cancel();
     this._hideOverlay();
   },
 
@@ -261,30 +263,54 @@ const FlightProcess = {
     window.speechSynthesis.cancel();
   },
 
-  // ── 코코에게 질문하기 (과정 페이지 안에서 처리) ──
+  // ── 코코에게 질문하기 (과정 페이지 안에 자체 입력창) ──
   _askCoco() {
-    const question = prompt('코코에게 질문하세요.\n예: "마스터 배터리가 뭐예요?"\n예: "왜 비컨을 먼저 켜야 해요?"');
-    if (!question || !question.trim()) return;
-
-    const steps = this.steps[this._currentScenario] || [];
-    const stepNames = steps.map(s => `${s.label}: ${s.detail}`).join('\n');
-
-    // 답변을 과정 페이지의 설명 박스에 표시
     const detailEl = document.getElementById('process-detail');
     const titleEl = document.getElementById('process-detail-title');
     const textEl = document.getElementById('process-detail-text');
-    if (detailEl && titleEl && textEl) {
-      titleEl.textContent = '🐣 코코가 답변 중...';
-      textEl.textContent = '잠시만 기다려주세요...';
-      detailEl.style.display = 'block';
+    if (!detailEl || !titleEl || !textEl) return;
+
+    // 이미 질문 입력창이 있으면 포커스만
+    if (document.getElementById('process-question-input')) {
+      document.getElementById('process-question-input').focus();
+      return;
     }
 
-    // Claude API 호출 (서버 프록시 또는 직접)
-    const system = `당신은 CockpitOS의 AI 비행 비서 코코입니다. 지금 비행 전 점검 단계입니다.\n체크리스트:\n${stepNames}\n\n비행 초보자에게 쉽고 친근하게 설명하세요. 한국어로 2~3문장.`;
+    titleEl.textContent = '🐣 코코에게 질문하세요';
+    textEl.innerHTML = `
+      <input id="process-question-input" type="text" placeholder='예: "마스터 배터리가 뭐예요?"'
+        style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;font-family:inherit;margin-bottom:8px;box-sizing:border-box">
+      <button onclick="FlightProcess._submitQuestion()" style="width:100%;padding:10px;border-radius:8px;border:none;background:rgba(96,165,250,0.6);color:#fff;font-size:14px;cursor:pointer;font-family:inherit">질문 보내기</button>
+    `;
+    detailEl.style.display = 'block';
 
-    // 서버 프록시가 있으면 사용, 없으면 기존 방식
-    const apiUrl = (location.port === '3000') ? '/api/ask' : 'https://api.anthropic.com/v1/messages';
-    const apiKey = (typeof App !== 'undefined') ? App.apiKey : '';
+    // 엔터키로도 전송
+    setTimeout(() => {
+      const input = document.getElementById('process-question-input');
+      if (input) {
+        input.focus();
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') FlightProcess._submitQuestion();
+        });
+      }
+    }, 100);
+  },
+
+  _submitQuestion() {
+    const input = document.getElementById('process-question-input');
+    if (!input || !input.value.trim()) return;
+    const question = input.value.trim();
+
+    const detailEl = document.getElementById('process-detail');
+    const titleEl = document.getElementById('process-detail-title');
+    const textEl = document.getElementById('process-detail-text');
+
+    titleEl.textContent = '🐣 코코가 답변 중...';
+    textEl.textContent = '잠시만 기다려주세요...';
+
+    const steps = this.steps[this._currentScenario] || [];
+    const stepNames = steps.map(s => `${s.label}: ${s.detail}`).join('\n');
+    const system = `당신은 CockpitOS의 AI 비행 비서 코코입니다. 지금 비행 전 점검 단계입니다.\n체크리스트:\n${stepNames}\n\n비행 초보자에게 쉽고 친근하게 설명하세요. 한국어로 2~3문장.`;
 
     if (location.port === '3000') {
       fetch('/api/ask', {
@@ -299,9 +325,8 @@ const FlightProcess = {
       .then(r => r.json())
       .then(data => {
         const answer = data.content ? data.content[0].text : (data.error || '답변을 받지 못했어요.');
-        if (titleEl) titleEl.textContent = `🐣 코코의 답변`;
+        if (titleEl) titleEl.textContent = '🐣 코코의 답변';
         if (textEl) textEl.textContent = answer;
-        // TTS
         if (!this._muted) {
           window.speechSynthesis.cancel();
           const u = new SpeechSynthesisUtterance(answer);
@@ -314,9 +339,8 @@ const FlightProcess = {
         if (textEl) textEl.textContent = 'API 키가 설정되지 않았어요. server/.env 파일을 확인해주세요.';
       });
     } else {
-      // API 키가 없는 경우 오프라인 답변
-      if (titleEl) titleEl.textContent = '🐣 코코';
-      if (textEl) textEl.textContent = '서버가 연결되지 않았어요. 카드를 탭하면 미리 준비된 설명을 볼 수 있어요!';
+      titleEl.textContent = '🐣 코코';
+      textEl.textContent = '서버가 연결되지 않았어요. 카드를 탭하면 미리 준비된 설명을 볼 수 있어요!';
     }
   },
 
