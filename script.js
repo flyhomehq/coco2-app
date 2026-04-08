@@ -440,6 +440,12 @@ const App = {
     clearTimeout(this._tourTimer);
     clearTimeout(this._fiveMinTimer);
     clearTimeout(this._briefingTimer);
+    // 마이크/음성박스 닫기 (모든 페이지 이동 시)
+    const micW = document.getElementById('mic-wrap');
+    const vbx = document.getElementById('voice-box');
+    if (micW) micW.classList.remove('show');
+    if (vbx) vbx.classList.remove('show');
+    if (this._sttRecognition) { try { this._sttRecognition.stop(); } catch(e) {} this._sttRecognition = null; }
     // p1 영상 정지
     const p1v = document.getElementById('p1-video');
     if (p1v) { p1v.pause(); p1v.muted = true; }
@@ -531,6 +537,12 @@ const App = {
     // 이전 음성/대화 즉시 중단
     window.speechSynthesis.cancel();
     clearInterval(this._dialogTimer);
+    // 마이크/음성박스 닫기
+    const micW = document.getElementById('mic-wrap');
+    const vbx = document.getElementById('voice-box');
+    if (micW) micW.classList.remove('show');
+    if (vbx) vbx.classList.remove('show');
+    if (this._sttRecognition) { try { this._sttRecognition.stop(); } catch(e) {} this._sttRecognition = null; }
 
     // HUD 화면에서 뒤로가면 → HUD만 닫고 과정 표시로 복귀
     if (typeof FlightHUD !== 'undefined' && FlightHUD.flightActive) {
