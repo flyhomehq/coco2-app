@@ -263,30 +263,21 @@ const FlightProcess = {
     window.speechSynthesis.cancel();
   },
 
-  // ── 코코에게 질문하기 (기존 마이크 UI — PIP과 같은 방식) ──
+  // ── 코코에게 질문하기 (오버레이 유지 + 마이크 UI를 위에 띄움) ──
   _askCoco() {
     if (typeof App === 'undefined') return;
 
-    // 과정 오버레이를 숨기고 기존 마이크 UI 표시 (PIP과 같은 패턴)
-    const overlay = document.getElementById('process-overlay');
-    if (overlay) overlay.style.display = 'none';
-
-    // 기존 마이크+음성박스 열기
+    // 마이크 버튼 + 음성 질문창을 강제로 표시 (오버레이는 그대로)
     const micWrap = document.getElementById('mic-wrap');
-    if (micWrap) micWrap.classList.add('show');
     const vb = document.getElementById('voice-box');
-    if (vb && !vb.classList.contains('show')) {
-      App.toggleMic();
-    }
 
-    // 마이크 닫힐 때 과정 오버레이 복원
-    const observer = new MutationObserver(() => {
-      if (vb && !vb.classList.contains('show')) {
-        if (overlay) overlay.style.display = 'flex';
-        observer.disconnect();
-      }
-    });
-    if (vb) observer.observe(vb, { attributes: true, attributeFilter: ['class'] });
+    if (micWrap) micWrap.classList.add('show');
+
+    // voice-box가 안 열려있으면 toggleMic으로 열기 (STT 시작됨)
+    if (vb && !vb.classList.contains('show')) {
+      vb.classList.add('show');
+      App._startSTT();
+    }
   },
 
   // ── 음성 차단 토글 ──
