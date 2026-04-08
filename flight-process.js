@@ -81,6 +81,7 @@ const FlightProcess = {
   // ── 건너뛰기 (바로 비행 시작) ──
   skip() {
     if (this._processTimer) clearTimeout(this._processTimer);
+    window.speechSynthesis.cancel();
 
     // 남은 명령 전부 실행
     const steps = this.steps[this._currentScenario] || [];
@@ -119,7 +120,6 @@ const FlightProcess = {
           <button onclick="FlightProcess._hideDetail()" style="margin-top:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:12px">확인</button>
         </div>
         <div id="process-bottom">
-          <button onclick="FlightProcess._askCoco()" id="process-ask-btn" style="background:rgba(96,165,250,0.2);border:1px solid rgba(96,165,250,0.4);border-radius:12px;color:#60a5fa;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;margin-bottom:8px;width:100%">${this._t('fpAsk')}</button>
           <button onclick="FlightProcess.skip()" id="process-skip-btn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;color:rgba(255,255,255,0.7);padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px">${this._t('fpSkip')}</button>
         </div>
       </div>
@@ -205,6 +205,9 @@ const FlightProcess = {
     if (skipBtn) {
       skipBtn.textContent = this._t('fpGo');
       skipBtn.onclick = () => {
+        // 음성 + 타이머 모두 중단
+        window.speechSynthesis.cancel();
+        if (this._processTimer) { clearTimeout(this._processTimer); this._processTimer = null; }
         this._hideOverlay();
         // 비행 HUD 전환
         if (typeof FlightHUD !== 'undefined' && FlightHUD.connected) {
@@ -356,9 +359,18 @@ const FlightProcess = {
   // ── 오버레이 보이기/숨기기 ──
   _showOverlay() {
     if (this._overlayEl) this._overlayEl.style.display = 'flex';
+    // 마이크 버튼 표시
+    const micW = document.getElementById('mic-wrap');
+    if (micW) micW.classList.add('show');
   },
 
   _hideOverlay() {
     if (this._overlayEl) this._overlayEl.style.display = 'none';
+    // 마이크 버튼 숨기기
+    const micW = document.getElementById('mic-wrap');
+    if (micW) micW.classList.remove('show');
+    const vbx = document.getElementById('voice-box');
+    if (vbx) vbx.classList.remove('show');
+    window.speechSynthesis.cancel();
   }
 };
