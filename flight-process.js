@@ -263,37 +263,77 @@ const FlightProcess = {
     window.speechSynthesis.cancel();
   },
 
-  // ── 코코에게 질문하기 (기존 음성 마이크 UI 사용) ──
+  // ── 코코에게 질문하기 (과정 페이지 안에 입력창) ──
   _askCoco() {
-    if (typeof App === 'undefined') return;
-
-    // 과정 페이지 컨텍스트를 App에 전달
-    const steps = this.steps[this._currentScenario] || [];
-    const stepNames = steps.map(s => `${s.label}: ${s.detail}`).join('\n');
-    App._flightProcessContext = `지금 비행 전 점검 단계입니다.\n체크리스트:\n${stepNames}`;
-
-    // 과정 오버레이를 잠시 뒤로 보내서 마이크 UI가 위에 보이게
-    const overlay = document.getElementById('process-overlay');
-    if (overlay) overlay.style.zIndex = '100';
-
-    // 기존 마이크 UI 강제 열기 (닫혀있을 때만)
-    const vb = document.getElementById('voice-box');
-    if (vb && !vb.classList.contains('show')) {
-      App.toggleMic();
+    let detailEl = document.getElementById('process-detail');
+    if (!detailEl) {
+      const container = document.getElementById('process-container');
+      if (!container) return;
+      detailEl = document.createElement('div');
+      detailEl.id = 'process-detail';
+      detailEl.innerHTML = '<div id="process-detail-title"></div><div id="process-detail-text"></div><button onclick="FlightProcess._hideDetail()" style="margin-top:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:12px">닫기</button>';
+      container.appendChild(detailEl);
     }
 
-    // 마이크 UI 닫힐 때 오버레이 z-index 복원
-    this._restoreOverlayZ = () => {
-      if (overlay) overlay.style.zIndex = '200';
-    };
-    // voice-box 닫힘 감지
-    const observer = new MutationObserver(() => {
-      if (vb && !vb.classList.contains('show')) {
-        if (overlay) overlay.style.zIndex = '200';
-        observer.disconnect();
+    const titleEl = document.getElementById('process-detail-title');
+    const textEl = document.getElementById('process-detail-text');
+    if (!titleEl || !textEl) return;
+
+    titleEl.textContent = '🐣 코코에게 질문하세요';
+    textEl.innerHTML = `
+      <input id="pq-input" type="text" placeholder="예: 마스터 배터리가 뭐예요?"
+        style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:8px">
+      <button onclick="FlightProcess._submitQ()" style="width:100%;padding:12px;border-radius:10px;border:none;background:rgba(96,165,250,0.7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit">전송</button>`;
+    detailEl.style.display = 'block';
+
+    setTimeout(() => {
+      const input = document.getElementById('pq-input');
+      if (input) {
+        input.focus();
+        input.onkeydown = (e) => { if (e.key === 'Enter') FlightProcess._submitQ(); };
       }
+    }, 100);
+  },
+
+  _submitQ() {
+    const input = document.getElementById('pq-input');
+    if (!input || !input.value.trim()) return;
+    const question = input.value.trim();
+
+    const titleEl = document.getElementById('process-detail-title');
+    const textEl = document.getElementById('process-detail-text');
+    titleEl.textContent = '🐣 코코가 답변 중...';
+    textEl.textContent = '잠시만 기다려주세요...';
+
+    const steps = this.steps[this._currentScenario] || [];
+    const ctx = steps.map(s => `${s.label}: ${s.detail}`).join('\n');
+
+    fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: `당신은 CockpitOS의 AI 비행 비서 코코입니다.\n체크리스트:\n${ctx}\n\n비행 초보자에게 쉽고 친근하게 2~3문장으로 설명하세요.`,
+        messages: [{ role: 'user', content: question }],
+        max_tokens: 300
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      const answer = data.content ? data.content[0].text : (data.error || '답변을 받지 못했어요.');
+      titleEl.textContent = '🐣 코코의 답변';
+      textEl.innerHTML = `<div style="margin-bottom:12px;line-height:1.6">${answer}</div>
+        <button onclick="FlightProcess._askCoco()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(96,165,250,0.4);background:rgba(96,165,250,0.2);color:#60a5fa;cursor:pointer;font-family:inherit;font-size:13px">다시 질문하기</button>`;
+      if (!FlightProcess._muted) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(answer);
+        u.lang = 'ko-KR'; u.rate = 0.92; u.pitch = 1.05;
+        window.speechSynthesis.speak(u);
+      }
+    })
+    .catch(() => {
+      titleEl.textContent = '🐣 코코';
+      textEl.textContent = 'API 키가 설정되지 않았어요. server/.env 파일을 확인해주세요.';
     });
-    if (vb) observer.observe(vb, { attributes: true, attributeFilter: ['class'] });
   },
 
   // ── 음성 차단 토글 ──
