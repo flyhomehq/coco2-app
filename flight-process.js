@@ -392,17 +392,34 @@ const FlightProcess = {
   // ── 오버레이 보이기/숨기기 ──
   _showOverlay() {
     if (this._overlayEl) this._overlayEl.style.display = 'flex';
-    // 기존 마이크 버튼 표시 (pointer-events:none 덕분에 클릭 가능)
+    // 기존 마이크+음성박스를 오버레이 안으로 이동 + 표시
     const micW = document.getElementById('mic-wrap');
-    if (micW) micW.classList.add('show');
+    const vbx = document.getElementById('voice-box');
+    if (micW) {
+      this._micOriginalParent = micW.parentNode;
+      this._overlayEl.appendChild(micW);
+      micW.classList.add('show');
+    }
+    if (vbx) {
+      this._vbOriginalParent = vbx.parentNode;
+      this._overlayEl.appendChild(vbx);
+    }
   },
 
   _hideOverlay() {
     if (this._overlayEl) this._overlayEl.style.display = 'none';
-    // 마이크 닫기
+    // 마이크+음성박스를 원래 위치(body)로 복원 + 숨기기
     const micW = document.getElementById('mic-wrap');
-    if (micW) micW.classList.remove('show');
     const vbx = document.getElementById('voice-box');
+    if (micW && this._micOriginalParent) {
+      this._micOriginalParent.appendChild(micW);
+      this._micOriginalParent = null;
+    }
+    if (vbx && this._vbOriginalParent) {
+      this._vbOriginalParent.appendChild(vbx);
+      this._vbOriginalParent = null;
+    }
+    if (micW) micW.classList.remove('show');
     if (vbx) vbx.classList.remove('show');
     window.speechSynthesis.cancel();
   }
