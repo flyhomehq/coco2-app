@@ -213,14 +213,14 @@ const FlightHUD = {
 
       <!-- 비행 컨트롤 버튼 -->
       <div id="hud-controls">
-        <button class="hud-ctrl-btn" onclick="FlightHUD.startDemo('preflight')" title="시범 보기">👀 시범</button>
-        <button class="hud-ctrl-btn" onclick="FlightHUD.requestChecklist('preflight')" title="체크리스트">📋 체크</button>
-        <button class="hud-ctrl-btn" onclick="FlightHUD._toggleThrottle()" title="스로틀">🔥 스로틀</button>
+        <button class="hud-ctrl-btn" onclick="FlightHUD.startDemo('preflight')">👀 ${this._t('hudDemo')}</button>
+        <button class="hud-ctrl-btn" onclick="FlightHUD.requestChecklist('preflight')">📋 ${this._t('hudCheck')}</button>
+        <button class="hud-ctrl-btn" onclick="FlightHUD._toggleThrottle()">🔥 ${this._t('hudThrottle')}</button>
       </div>
 
       <!-- 스로틀 슬라이더 (숨김) -->
       <div id="hud-throttle-panel" style="display:none">
-        <div style="font-size:12px;color:#FFD060;margin-bottom:6px">스로틀</div>
+        <div style="font-size:12px;color:#FFD060;margin-bottom:6px">${this._t('hudThrottle')}</div>
         <input type="range" id="hud-throttle-slider" min="0" max="100" value="0"
           oninput="FlightHUD.sendCommand('THROTTLE_SET', Number(this.value))"
           style="width:100%;accent-color:#FFD060">

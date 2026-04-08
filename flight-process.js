@@ -136,7 +136,7 @@ const FlightProcess = {
         <div id="process-detail" style="display:none">
           <div id="process-detail-title"></div>
           <div id="process-detail-text"></div>
-          <button onclick="FlightProcess._hideDetail()" style="margin-top:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:12px">확인</button>
+          <button onclick="FlightProcess._hideDetail()" style="margin-top:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:12px">${this._t('fpOk')}</button>
         </div>
         <div id="process-bottom">
           <button onclick="FlightProcess.skip()" id="process-skip-btn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;color:rgba(255,255,255,0.7);padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px">${this._t('fpSkip')}</button>
