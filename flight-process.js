@@ -6,6 +6,12 @@
 
 const FlightProcess = {
 
+  // 현재 언어의 번역 텍스트 가져오기
+  _t(key) {
+    const lang = (typeof App !== 'undefined') ? App.lang : 'ko';
+    return (T && T[lang] && T[lang][key]) ? T[lang][key] : (T && T.ko && T.ko[key]) || key;
+  },
+
   // ── 비행 준비 단계 정의 ──
   steps: {
     seoul_tour: [
@@ -99,12 +105,12 @@ const FlightProcess = {
     overlay.innerHTML = `
       <div id="process-container">
         <div id="process-topbar">
-          <button onclick="FlightProcess.stop(); App.goBack();" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;padding:8px 16px;cursor:pointer;font-family:inherit;font-size:13px">← 뒤로</button>
-          <button onclick="FlightProcess._toggleMute()" id="process-mute-btn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;padding:8px 16px;cursor:pointer;font-family:inherit;font-size:13px">🔊 음성</button>
+          <button onclick="FlightProcess.stop(); App.goBack();" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;padding:8px 16px;cursor:pointer;font-family:inherit;font-size:13px">${this._t('fpBack')}</button>
+          <button onclick="FlightProcess._toggleMute()" id="process-mute-btn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;padding:8px 16px;cursor:pointer;font-family:inherit;font-size:13px">${this._t('fpMute')}</button>
         </div>
         <div id="process-header">
           <div id="process-coco">🐣</div>
-          <div id="process-title">코코가 준비하고 있어요!</div>
+          <div id="process-title">${this._t('fpPreparing')}</div>
         </div>
         <div id="process-steps"></div>
         <div id="process-detail" style="display:none">
@@ -113,8 +119,8 @@ const FlightProcess = {
           <button onclick="FlightProcess._hideDetail()" style="margin-top:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:12px">확인</button>
         </div>
         <div id="process-bottom">
-          <button onclick="FlightProcess._askCoco()" id="process-ask-btn" style="background:rgba(96,165,250,0.2);border:1px solid rgba(96,165,250,0.4);border-radius:12px;color:#60a5fa;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;margin-bottom:8px;width:100%">🎤 코코에게 질문하기</button>
-          <button onclick="FlightProcess.skip()" id="process-skip-btn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;color:rgba(255,255,255,0.7);padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px">⏭ 건너뛰고 바로 비행</button>
+          <button onclick="FlightProcess._askCoco()" id="process-ask-btn" style="background:rgba(96,165,250,0.2);border:1px solid rgba(96,165,250,0.4);border-radius:12px;color:#60a5fa;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;margin-bottom:8px;width:100%">${this._t('fpAsk')}</button>
+          <button onclick="FlightProcess.skip()" id="process-skip-btn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;color:rgba(255,255,255,0.7);padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px">${this._t('fpSkip')}</button>
         </div>
       </div>
     `;
@@ -193,11 +199,11 @@ const FlightProcess = {
     this._renderSteps();
 
     const title = document.getElementById('process-title');
-    if (title) title.textContent = '준비 완료! 출발합니다!';
+    if (title) title.textContent = this._t('fpComplete');
 
     const skipBtn = document.getElementById('process-skip-btn');
     if (skipBtn) {
-      skipBtn.textContent = '🛫 출발!';
+      skipBtn.textContent = this._t('fpGo');
       skipBtn.onclick = () => {
         this._hideOverlay();
         // 비행 HUD 전환
@@ -215,14 +221,8 @@ const FlightProcess = {
 
     // TTS로 음성 안내
     if (typeof App !== 'undefined' && App.ttsOn && !this._muted) {
-      const msgs = {
-        ko: '모든 준비가 완료되었어요! 출발 버튼을 눌러주세요!',
-        en: 'All set! Press the button to take off!',
-        ja: '準備完了です！出発ボタンを押してください！',
-        zh: '一切就绪！请按出发按钮！'
-      };
       const lang = (typeof App !== 'undefined') ? App.lang : 'ko';
-      const utterance = new SpeechSynthesisUtterance(msgs[lang] || msgs.ko);
+      const utterance = new SpeechSynthesisUtterance(this._t('fpAllDone'));
       utterance.lang = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' }[lang] || 'ko-KR';
       utterance.rate = 0.92;
       utterance.pitch = 1.05;
@@ -265,10 +265,24 @@ const FlightProcess = {
 
   // ── 코코에게 질문하기 (과정 페이지 안 자체 질문창) ──
   _askCoco() {
-    const detailEl = document.getElementById('process-detail');
-    const titleEl = document.getElementById('process-detail-title');
-    const textEl = document.getElementById('process-detail-text');
-    if (!detailEl || !titleEl || !textEl) return;
+    let detailEl = document.getElementById('process-detail');
+    let titleEl = document.getElementById('process-detail-title');
+    let textEl = document.getElementById('process-detail-text');
+
+    // detail 영역이 없으면 생성
+    if (!detailEl) {
+      const container = document.getElementById('process-container');
+      if (!container) return;
+      const d = document.createElement('div');
+      d.id = 'process-detail';
+      d.style.display = 'none';
+      d.innerHTML = '<div id="process-detail-title"></div><div id="process-detail-text"></div><button onclick="FlightProcess._hideDetail()" style="margin-top:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:12px">닫기</button>';
+      container.appendChild(d);
+      detailEl = d;
+      titleEl = document.getElementById('process-detail-title');
+      textEl = document.getElementById('process-detail-text');
+    }
+    if (!titleEl || !textEl) return;
 
     titleEl.textContent = '🐣 코코에게 질문하세요';
     textEl.innerHTML = `
@@ -335,7 +349,7 @@ const FlightProcess = {
   _toggleMute() {
     this._muted = !this._muted;
     const btn = document.getElementById('process-mute-btn');
-    if (btn) btn.textContent = this._muted ? '🔇 음소거' : '🔊 음성';
+    if (btn) btn.textContent = this._muted ? this._t('fpMuted') : this._t('fpMute');
     if (this._muted) window.speechSynthesis.cancel();
   },
 

@@ -9,6 +9,12 @@ const FlightHUD = {
   connected: false,
   flightActive: false,
   lastData: null,
+
+  // 다국어 헬퍼
+  _t(key) {
+    const lang = (typeof App !== 'undefined') ? App.lang : 'ko';
+    return (T && T[lang] && T[lang][key]) ? T[lang][key] : (T && T.ko && T.ko[key]) || key;
+  },
   hudElement: null,
 
   // ── WebSocket 연결 ──
@@ -278,18 +284,22 @@ const FlightHUD = {
       [10, '#ef4444'], [20, '#FFD060'], [Infinity, '#4ade80']
     ]);
 
-    // 비행 단계
+    // 비행 단계 (다국어)
+    const _ht = (key) => {
+      const lang = (typeof App !== 'undefined') ? App.lang : 'ko';
+      return (T && T[lang] && T[lang][key]) ? T[lang][key] : (T && T.ko && T.ko[key]) || key;
+    };
     const phases = {
-      parked: { icon: '🅿️', text: '주기 중' },
-      ready: { icon: '🔑', text: '엔진 가동' },
-      taxi: { icon: '🚕', text: '지상 활주' },
-      takeoff: { icon: '🛫', text: '이륙!' },
-      climb: { icon: '📈', text: '상승 중' },
-      cruise: { icon: '✈️', text: '순항 중' },
-      descent: { icon: '📉', text: '하강 중' },
-      approach: { icon: '🛬', text: '접근 중' },
-      landing: { icon: '🎯', text: '착륙 중' },
-      landed: { icon: '✅', text: '착륙 완료!' }
+      parked: { icon: '🅿️', text: _ht('hudParked') },
+      ready: { icon: '🔑', text: _ht('hudReady') },
+      taxi: { icon: '🚕', text: _ht('hudTaxi') },
+      takeoff: { icon: '🛫', text: _ht('hudTakeoff') },
+      climb: { icon: '📈', text: _ht('hudClimb') },
+      cruise: { icon: '✈️', text: _ht('hudCruise') },
+      descent: { icon: '📉', text: _ht('hudDescent') },
+      approach: { icon: '🛬', text: _ht('hudApproach') },
+      landing: { icon: '🎯', text: _ht('hudLanding') },
+      landed: { icon: '✅', text: _ht('hudLanded') }
     };
     const phase = phases[data.phase] || phases.parked;
     setVal('hud-phase-icon', phase.icon);
@@ -447,10 +457,10 @@ const FlightHUD = {
 
     if (connected) {
       dot.style.color = '#4ade80';
-      text.textContent = 'Mock 모드';
+      text.textContent = this._t('hudConnected');
     } else {
       dot.style.color = '#ef4444';
-      text.textContent = '연결 끊김';
+      text.textContent = this._t('hudDisconnected');
     }
   },
 
