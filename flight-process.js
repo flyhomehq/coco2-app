@@ -12,36 +12,55 @@ const FlightProcess = {
     return (T && T[lang] && T[lang][key]) ? T[lang][key] : (T && T.ko && T.ko[key]) || key;
   },
 
-  // ── 비행 준비 단계 정의 ──
-  steps: {
+  // ── 비행 준비 단계 (구조 데이터) ──
+  _stepBase: {
     seoul_tour: [
-      { id: 'airport',    label: '김포공항 선택',           detail: '김포국제공항(RKSS)은 서울 서쪽에 있는 공항이에요. 국내선과 일부 국제선이 운항합니다.', duration: 1500, command: null, cameraPreset: null, voice: '김포공항을 선택합니다.' },
-      { id: 'aircraft',   label: 'Cessna 172 배치',         detail: 'Cessna 172는 세계에서 가장 많이 쓰이는 훈련용 비행기예요. 초보자에게 가장 좋습니다.', duration: 1500, command: null, cameraPreset: null, voice: '세스나 172를 배치합니다.' },
-      { id: 'runway',     label: '활주로 32L 이동',         detail: '활주로 32L은 방향 321도를 뜻해요. L은 왼쪽(Left)입니다. 같은 방향에 활주로가 2개면 L/R로 구분해요.', duration: 2000, command: null, cameraPreset: null, voice: '활주로 32 레프트로 이동합니다.' },
-      { id: 'weather',    label: '날씨 확인 (맑음)',         detail: 'METAR라는 항공 기상 정보를 확인합니다. 오늘은 맑고 바람이 약해서 비행하기 좋아요!', duration: 1500, command: null, cameraPreset: null, voice: '날씨를 확인합니다. 오늘은 맑아요!' },
-      { id: 'battery',    label: '마스터 배터리 ON',         detail: '비행기의 전원을 켜는 첫 단계예요. 자동차의 시동키를 ACC에 돌리는 것과 같아요.', duration: 1000, command: 'TOGGLE_MASTER_BATTERY', cameraPreset: { target: 'masterBattery', x: -0.3, y: 0.2, z: -0.1 }, voice: '마스터 배터리를 켭니다. 왼쪽 하단의 빨간 스위치예요.' },
-      { id: 'avionics',   label: '아비오닉스 ON',           detail: '아비오닉스는 항공 전자장비를 뜻해요. 이걸 켜야 계기판에 불이 들어옵니다.', duration: 1000, command: 'TOGGLE_AVIONICS', cameraPreset: { target: 'avionics', x: -0.3, y: 0.2, z: -0.1 }, voice: '아비오닉스를 켭니다. 계기판에 불이 들어와요.' },
-      { id: 'beacon',     label: '비컨 라이트 ON',          detail: '비컨은 빨간 회전 경고등이에요. "지금 엔진을 켤 거니까 가까이 오지 마세요"라는 신호입니다.', duration: 800, command: 'TOGGLE_BEACON_LIGHTS', cameraPreset: { target: 'beaconLight', x: -0.2, y: 0.1, z: -0.1 }, voice: '비컨 라이트를 켭니다. 빨간 경고등이에요.' },
-      { id: 'engine',     label: '엔진 시동',               detail: '프로펠러가 돌아가기 시작해요! 실제로는 프라이머, 혼합기, 스타터 순서가 있지만 코코가 한번에 해드려요.', duration: 2000, command: 'ENGINE_AUTO_START', cameraPreset: { target: 'throttle', x: 0.0, y: -0.1, z: 0.0 }, voice: '엔진 시동을 겁니다. 프로펠러가 돌아가기 시작해요!' },
-      { id: 'nav_lights', label: 'NAV/스트로브 라이트 ON',  detail: 'NAV 라이트는 왼쪽 빨강, 오른쪽 초록이에요. 다른 비행기가 내 방향을 알 수 있어요.', duration: 800, command: 'TOGGLE_NAV_LIGHTS', cameraPreset: { target: 'navLights', x: -0.2, y: 0.1, z: -0.1 }, voice: '항법 라이트를 켭니다.' },
-      { id: 'flaps',      label: '플랩 10° 설정',           detail: '플랩은 날개 뒤쪽의 판이에요. 펼치면 양력이 커져서 낮은 속도에서도 뜰 수 있어요.', duration: 800, command: 'SET_FLAPS_10', cameraPreset: { target: 'flaps', x: 0.1, y: -0.1, z: 0.0 }, voice: '플랩을 10도로 설정합니다.' },
-      { id: 'brake_off',  label: '파킹 브레이크 해제',      detail: '주차 브레이크를 풀어야 움직일 수 있어요. 자동차에서 사이드 브레이크 내리는 것과 같아요.', duration: 800, command: 'RELEASE_PARKING_BRAKE', cameraPreset: { target: 'parkingBrake', x: 0.0, y: -0.2, z: 0.0 }, voice: '파킹 브레이크를 해제합니다.' },
-      { id: 'ready',      label: '이륙 준비 완료!',         detail: '모든 준비가 끝났어요! 스로틀(엔진 출력)을 올리면 비행기가 달리기 시작합니다.', duration: 1000, command: null, cameraPreset: { target: 'defaultView', x: 0, y: 0, z: 0 }, voice: '이륙 준비가 완료되었습니다! 출발 버튼을 눌러주세요.' }
+      { id: 'airport',    duration: 1500, command: null, cameraPreset: null },
+      { id: 'aircraft',   duration: 1500, command: null, cameraPreset: null },
+      { id: 'runway',     duration: 2000, command: null, cameraPreset: null },
+      { id: 'weather',    duration: 1500, command: null, cameraPreset: null },
+      { id: 'battery',    duration: 1000, command: 'TOGGLE_MASTER_BATTERY', cameraPreset: { target: 'masterBattery', x: -0.3, y: 0.2, z: -0.1 } },
+      { id: 'avionics',   duration: 1000, command: 'TOGGLE_AVIONICS', cameraPreset: { target: 'avionics', x: -0.3, y: 0.2, z: -0.1 } },
+      { id: 'beacon',     duration: 800,  command: 'TOGGLE_BEACON_LIGHTS', cameraPreset: { target: 'beaconLight', x: -0.2, y: 0.1, z: -0.1 } },
+      { id: 'engine',     duration: 2000, command: 'ENGINE_AUTO_START', cameraPreset: { target: 'throttle', x: 0.0, y: -0.1, z: 0.0 } },
+      { id: 'nav_lights', duration: 800,  command: 'TOGGLE_NAV_LIGHTS', cameraPreset: { target: 'navLights', x: -0.2, y: 0.1, z: -0.1 } },
+      { id: 'flaps',      duration: 800,  command: 'SET_FLAPS_10', cameraPreset: { target: 'flaps', x: 0.1, y: -0.1, z: 0.0 } },
+      { id: 'brake_off',  duration: 800,  command: 'RELEASE_PARKING_BRAKE', cameraPreset: { target: 'parkingBrake', x: 0.0, y: -0.2, z: 0.0 } },
+      { id: 'ready',      duration: 1000, command: null, cameraPreset: { target: 'defaultView', x: 0, y: 0, z: 0 } },
     ],
     jeju_tour: [
-      { id: 'airport',    label: '제주공항 선택',           detail: '제주국제공항(RKPC)은 대한민국에서 가장 붐비는 공항 중 하나예요.', duration: 1500, command: null },
-      { id: 'aircraft',   label: 'Cessna 172 배치',         detail: 'Cessna 172는 세계에서 가장 많이 쓰이는 훈련용 비행기예요.', duration: 1500, command: null },
-      { id: 'runway',     label: '활주로 07 이동',          detail: '활주로 07은 방향 73도(동쪽)를 뜻해요. 제주공항의 주요 활주로입니다.', duration: 2000, command: null },
-      { id: 'weather',    label: '날씨 확인 (맑음)',         detail: '제주는 바람이 조금 있지만 비행하기 좋은 날씨에요!', duration: 1500, command: null },
-      { id: 'battery',    label: '마스터 배터리 ON',         detail: '비행기의 전원을 켜는 첫 단계예요.', duration: 1000, command: 'TOGGLE_MASTER_BATTERY' },
-      { id: 'avionics',   label: '아비오닉스 ON',           detail: '항공 전자장비를 켭니다.', duration: 1000, command: 'TOGGLE_AVIONICS' },
-      { id: 'beacon',     label: '비컨 라이트 ON',          detail: '빨간 회전 경고등을 켭니다.', duration: 800, command: 'TOGGLE_BEACON_LIGHTS' },
-      { id: 'engine',     label: '엔진 시동',               detail: '프로펠러가 돌아가기 시작합니다!', duration: 2000, command: 'ENGINE_AUTO_START' },
-      { id: 'nav_lights', label: 'NAV/스트로브 라이트 ON',  detail: '항법등을 켭니다.', duration: 800, command: 'TOGGLE_NAV_LIGHTS' },
-      { id: 'flaps',      label: '플랩 10° 설정',           detail: '이륙을 위해 플랩을 펼칩니다.', duration: 800, command: 'SET_FLAPS_10' },
-      { id: 'brake_off',  label: '파킹 브레이크 해제',      detail: '주차 브레이크를 풉니다.', duration: 800, command: 'RELEASE_PARKING_BRAKE' },
-      { id: 'ready',      label: '이륙 준비 완료!',         detail: '모든 준비가 끝났어요! 아름다운 제주 하늘로 출발합니다!', duration: 1000, command: null }
+      { id: 'airport',    duration: 1500, command: null },
+      { id: 'aircraft',   duration: 1500, command: null },
+      { id: 'runway',     duration: 2000, command: null },
+      { id: 'weather',    duration: 1500, command: null },
+      { id: 'battery',    duration: 1000, command: 'TOGGLE_MASTER_BATTERY' },
+      { id: 'avionics',   duration: 1000, command: 'TOGGLE_AVIONICS' },
+      { id: 'beacon',     duration: 800,  command: 'TOGGLE_BEACON_LIGHTS' },
+      { id: 'engine',     duration: 2000, command: 'ENGINE_AUTO_START' },
+      { id: 'nav_lights', duration: 800,  command: 'TOGGLE_NAV_LIGHTS' },
+      { id: 'flaps',      duration: 800,  command: 'SET_FLAPS_10' },
+      { id: 'brake_off',  duration: 800,  command: 'RELEASE_PARKING_BRAKE' },
+      { id: 'ready',      duration: 1000, command: null },
     ]
+  },
+
+  // 현재 언어에 맞는 steps 반환
+  get steps() {
+    const lang = (typeof App !== 'undefined') ? App.lang : 'ko';
+    const result = {};
+    for (const scenario of ['seoul_tour', 'jeju_tour']) {
+      const base = this._stepBase[scenario];
+      const i18n = (typeof STEPS_I18N !== 'undefined' && STEPS_I18N[scenario] && STEPS_I18N[scenario][lang])
+        ? STEPS_I18N[scenario][lang]
+        : (typeof STEPS_I18N !== 'undefined' && STEPS_I18N[scenario] ? STEPS_I18N[scenario].ko : null);
+      result[scenario] = base.map((s, idx) => ({
+        ...s,
+        label: i18n ? i18n[idx].label : s.id,
+        detail: i18n ? i18n[idx].detail : '',
+        voice: i18n ? i18n[idx].voice : '',
+      }));
+    }
+    return result;
   },
 
   _currentStepIndex: 0,
