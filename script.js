@@ -642,10 +642,7 @@ const App = {
     const instOverlay = document.getElementById('inst-overlay');
     if (instOverlay) instOverlay.innerHTML = '';
 
-    // 자동 투어 시작
-    this._startTour();
-
-    // "보여주는 단축키" — 서버 모드에서 과정 표시
+    // "보여주는 단축키" — 서버 모드에서 과정 표시 (투어 건너뜀)
     if (typeof FlightHUD !== 'undefined' && FlightHUD.connected && typeof FlightProcess !== 'undefined') {
       const scenario = this.flightLoc === 'jeju' ? 'jeju_tour' : 'seoul_tour';
 
@@ -670,6 +667,9 @@ const App = {
 
       // 과정 표시 시작 (원클릭 → 단계별 진행 → 완료 후 HUD)
       FlightProcess.start(scenario);
+    } else {
+      // 서버 미연결 시 기존 투어 (PT용)
+      this._startTour();
     }
   },
 
