@@ -1,0 +1,16 @@
+{
+  "name": "cockpitos-server",
+  "version": "1.0.0",
+  "description": "CockpitOS Backend Server — AI Flight Instructor",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "ws": "^8.18.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0"
+  }
+}

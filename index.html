@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#050a14">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=20260443">
+<link rel="stylesheet" href="flight-hud.css?v=20260407">
 </head>
 <body>
 <div id="app">
@@ -50,17 +51,23 @@
 <div class="page" id="p2">
   <div class="mode-title" id="p2-title">✈ CockpitOS</div>
   <div class="mode-sub" id="p2-sub">어떤 비행을 하시겠어요?</div>
-  <!-- 여행/관광 카드 -->
+  <!-- 원클릭 비행 카드 -->
   <div class="mode-card gold" onclick="App.goTo('p3')" style="overflow:hidden">
     <img src="images/backgrounds/서울항공사진.PNG" style="width:100%;height:120px;object-fit:cover;border-radius:14px;margin-bottom:10px;opacity:0.8">
-    <div class="mc-top"><span class="mc-icon">🟡</span><span class="mc-title" id="p2-beg">여행/관광</span></div>
-    <div class="mc-desc" id="p2-beg-d">버튼 하나로 서울, 제주 하늘을 비행합니다.</div>
+    <div class="mc-top"><span class="mc-icon">🟡</span><span class="mc-title" id="p2-beg">원클릭 비행</span></div>
+    <div class="mc-desc" id="p2-beg-d">버튼 하나로 비행 시작! 코코가 모든 준비를 대신하고, 과정을 보여드려요.</div>
   </div>
-  <!-- 훈련생 카드 -->
+  <!-- 따라하기 비행 카드 -->
   <div class="mode-card" onclick="App.goTo('p4')" style="overflow:hidden">
     <img src="images/backgrounds/3p_bg_settings_beginner.png" style="width:100%;height:120px;object-fit:cover;border-radius:14px;margin-bottom:10px;opacity:0.8">
-    <div class="mc-top"><span class="mc-icon">🔵</span><span class="mc-title" id="p2-stu">훈련생 모드</span></div>
-    <div class="mc-desc" id="p2-stu-d">항공 용어와 체크리스트 중심으로 실전에 가깝게 진행합니다.</div>
+    <div class="mc-top"><span class="mc-icon">🔵</span><span class="mc-title" id="p2-stu">따라하기 비행</span></div>
+    <div class="mc-desc" id="p2-stu-d">코코가 먼저 시범을 보여주고, 당신이 직접 따라하는 단계별 비행입니다.</div>
+  </div>
+  <!-- 자유 비행 카드 -->
+  <div class="mode-card purple" onclick="App.goTo('p5free')" style="overflow:hidden;display:none" id="p2-free-card">
+    <img src="images/backgrounds/2p_plane.PNG" style="width:100%;height:120px;object-fit:cover;border-radius:14px;margin-bottom:10px;opacity:0.8">
+    <div class="mc-top"><span class="mc-icon">🟢</span><span class="mc-title" id="p2-free">자유 비행</span></div>
+    <div class="mc-desc" id="p2-free-d">직접 조종하세요. 코코가 옆에서 대기하다 도움이 필요하면 불러주세요.</div>
   </div>
   <!-- 시연 카드 -->
   <div class="mode-card purple" onclick="App.goTo('p5')" style="overflow:hidden">
@@ -615,5 +622,7 @@
 
 <script src="data.js?v=20260429"></script>
     <script src="script.js?v=20260429"></script>
+    <script src="flight-process.js?v=20260408"></script>
+    <script src="flight-hud.js?v=20260408"></script>
 </body>
 </html><!-- cache bust Sun Apr  5 02:57:25     2026 -->

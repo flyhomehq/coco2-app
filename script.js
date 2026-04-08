@@ -2,8 +2,8 @@ const T = {
   ko: {
     back:'뒤로', settings:'설정', cocoName:'코코',
     p2title:'✈ CockpitOS', p2sub:'어떤 비행을 하시겠어요?',
-    p2beg:'원클릭 비행', p2begD:'생초보도 버튼 하나로 바로 비행합니다.',
-    p2stu:'훈련생 모드', p2stuD:'항공 용어와 체크리스트 중심.',
+    p2beg:'원클릭 비행', p2begD:'버튼 하나로 비행 시작! 코코가 모든 준비를 대신하고, 과정을 보여드려요.',
+    p2stu:'따라하기 비행', p2stuD:'코코가 먼저 시범을 보여주고, 직접 따라하는 단계별 비행입니다.',
     p2demo:'시연 모드', p2demoD:'투자자 PT용 시연 모드입니다.',
     p3title:'원클릭 비행', p3sub:'어떻게 시작하시겠어요?',
     p3simple:'🟡 바로 날기',
@@ -50,8 +50,8 @@ const T = {
   en: {
     back:'Back', settings:'Settings', cocoName:'Coco',
     p2title:'✈ CockpitOS', p2sub:'What flight would you like?',
-    p2beg:'One-Click Flight', p2begD:'Even beginners can fly with one button.',
-    p2stu:'Student Mode', p2stuD:'Aviation terms and checklists.',
+    p2beg:'One-Click Flight', p2begD:'One button to fly! Coco handles everything and shows you the process.',
+    p2stu:'Follow-Along Flight', p2stuD:'Coco demonstrates first, then you follow step by step.',
     p2demo:'Demo Mode', p2demoD:'Investor PT demo mode.',
     p3title:'One-Click Flight', p3sub:'How would you like to start?',
     p3simple:'🟡 Fly Now',
@@ -98,8 +98,8 @@ const T = {
   ja: {
     back:'戻る', settings:'設定', cocoName:'ココ',
     p2title:'✈ CockpitOS', p2sub:'どんな飛行をしますか？',
-    p2beg:'ワンクリック飛行', p2begD:'初心者でもボタン一つで飛べます。',
-    p2stu:'訓練生モード', p2stuD:'航空用語とチェックリスト中心。',
+    p2beg:'ワンクリック飛行', p2begD:'ボタン一つで飛行開始！ココが全て準備し、過程をお見せします。',
+    p2stu:'フォローフライト', p2stuD:'ココがまず見本を見せ、あなたがステップごとに実践します。',
     p2demo:'デモモード', p2demoD:'投資家向けデモモードです。',
     p3title:'ワンクリック飛行', p3sub:'どのように始めますか？',
     p3simple:'🟡 すぐ飛ぶ',
@@ -146,8 +146,8 @@ const T = {
   zh: {
     back:'返回', settings:'设置', cocoName:'可可',
     p2title:'✈ CockpitOS', p2sub:'想要什么样的飞行？',
-    p2beg:'一键飞行', p2begD:'零基础也能一键起飞。',
-    p2stu:'学员模式', p2stuD:'以航空术语和检查单为主。',
+    p2beg:'一键飞行', p2begD:'一键开始飞行！可可为您准备一切，并展示全过程。',
+    p2stu:'跟随飞行', p2stuD:'可可先示范，然后您按步骤实践。',
     p2demo:'演示模式', p2demoD:'投资者演示模式。',
     p3title:'一键飞行', p3sub:'您想如何开始？',
     p3simple:'🟡 立即飞行',
@@ -725,6 +725,23 @@ const App = {
     window.speechSynthesis.cancel();
     clearInterval(this._dialogTimer);
 
+    // HUD + 과정 표시 정리
+    if (typeof FlightHUD !== 'undefined') FlightHUD.stopFlight();
+    if (typeof FlightProcess !== 'undefined') FlightProcess.stop();
+
+    // p312 원래 UI 복원
+    if (this.currentPage === 'p312') {
+      const p312 = document.getElementById('p312');
+      if (p312) {
+        p312.querySelectorAll(':scope > *').forEach(el => { el.style.display = ''; });
+        p312.style.background = '';
+        p312.style.padding = '';
+      }
+      // 설정 버튼 복원
+      const settingsBtn = document.querySelector('#topbar .btn:nth-child(2)');
+      if (settingsBtn) settingsBtn.style.display = '';
+    }
+
     if (this.pageStack.length === 0) return;
     const prev = this.pageStack.pop();
     const cur = document.getElementById(this.currentPage);
@@ -800,6 +817,33 @@ const App = {
 
     // 자동 투어 시작
     this._startTour();
+
+    // "보여주는 단축키" — 서버 모드에서 과정 표시
+    if (typeof FlightHUD !== 'undefined' && FlightHUD.connected && typeof FlightProcess !== 'undefined') {
+      const scenario = this.flightLoc === 'jeju' ? 'jeju_tour' : 'seoul_tour';
+
+      // 기존 카드/UI 숨기고 비행 화면 준비
+      const p312 = document.getElementById('p312');
+      if (p312) {
+        p312.querySelectorAll(':scope > *').forEach(el => {
+          if (el.id !== 'flight-hud' && el.id !== 'inst-overlay' && el.id !== 'tour-card' && el.id !== 'tour-ad') {
+            el.style.display = 'none';
+          }
+        });
+        p312.style.background = 'transparent';
+        p312.style.padding = '0';
+      }
+      document.getElementById('coco').classList.remove('show');
+      document.getElementById('dialog').style.display = 'none';
+      document.getElementById('mic-wrap').classList.remove('show');
+
+      // HUD에서 설정 버튼 숨기기 (이 화면에서는 불필요)
+      const settingsBtn = document.querySelector('#topbar .btn:nth-child(2)');
+      if (settingsBtn) settingsBtn.style.display = 'none';
+
+      // 과정 표시 시작 (원클릭 → 단계별 진행 → 완료 후 HUD)
+      FlightProcess.start(scenario);
+    }
   },
 
   // ── 자동 투어 엔진 ──

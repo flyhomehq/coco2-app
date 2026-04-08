@@ -1,0 +1,83 @@
+==========================================
+  CockpitOS 서버 실행 가이드
+  (대웅님 비상용 — 멘토 없이도 가능!)
+==========================================
+
+■ 서버를 켜는 방법 (3단계)
+──────────────────────────
+
+1단계: VSCode 터미널 열기
+  → VSCode 상단 메뉴: 터미널(Terminal) → 새 터미널(New Terminal)
+  → 또는 키보드: Ctrl + `  (물결 키, ESC 바로 아래)
+
+2단계: server 폴더로 이동
+  → 터미널에 아래 명령어 복사+붙여넣기 후 Enter:
+
+  cd server
+
+3단계: 서버 시작
+  → 터미널에 아래 명령어 복사+붙여넣기 후 Enter:
+
+  npm start
+
+  → 아래 메시지가 나오면 성공!
+  ╔══════════════════════════════════════════╗
+  ║       CockpitOS Server Started!          ║
+  ╚══════════════════════════════════════════╝
+
+
+■ 앱을 여는 방법
+──────────────────────────
+
+  브라우저(Edge, Chrome)에서 아래 주소 입력:
+  http://localhost:3000
+
+
+■ 서버를 끄는 방법
+──────────────────────────
+
+  터미널에서 Ctrl + C 누르기
+
+
+■ API 키 설정하는 방법
+──────────────────────────
+
+  1. VSCode에서 server/.env 파일 열기
+  2. ANTHROPIC_API_KEY= 뒤에 API 키 붙여넣기
+  3. 파일 저장 (Ctrl + S)
+  4. 서버 재시작 (끄고 → 다시 npm start)
+
+
+■ 문제가 생겼을 때
+──────────────────────────
+
+  에러: "port already in use"
+  → 서버가 이미 켜져 있는 거예요
+  → 기존 터미널에서 Ctrl+C로 끄고 다시 시작
+
+  에러: "Cannot find module"
+  → 터미널에서: npm install 입력 후 Enter
+  → 그 다음: npm start
+
+  PT가 급히 필요할 때:
+  → coco2-app-PT보관용 폴더의 index.html 더블클릭
+  → 또는 https://flyhomehq.github.io/coco2-app/ 접속
+
+
+■ 현재 파일 구조
+──────────────────────────
+
+  coco2-app/
+  ├── index.html      ← 프론트엔드 (앱 화면)
+  ├── script.js       ← 프론트엔드 로직
+  ├── style.css       ← 스타일
+  ├── data.js         ← 이미지 데이터
+  ├── server/         ← ★ 백엔드 서버 (새로 만든 것)
+  │   ├── index.js        ← 서버 메인
+  │   ├── mock-flight.js  ← 가짜 비행 데이터 생성기
+  │   ├── flight-judge.js ← 비행 상태 판단 (정상/주의/위험)
+  │   ├── api-proxy.js    ← Claude API 프록시
+  │   ├── .env            ← API 키 설정 (비밀!)
+  │   └── package.json    ← 서버 설정
+  ├── images/         ← 이미지들
+  └── video/          ← 영상들

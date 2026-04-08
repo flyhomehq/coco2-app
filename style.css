@@ -137,7 +137,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#050a14;color:#fff;overflo
 .vb-done{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:12px;color:#fff;font-size:13px;font-weight:600;padding:10px 12px;cursor:pointer;font-family:inherit}
 
 /* PIP */
-#pip-wrap{position:fixed;inset:0;z-index:80;display:none;flex-direction:column;background:#000}
+#pip-wrap{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;background:#000}
 #pip-wrap.show{display:flex}
 #pip-video{flex:1;object-fit:cover;width:100%;pointer-events:none;filter:brightness(1.15) contrast(1.05)}
 #pip-bar{padding:6px 10px 10px;display:flex;gap:6px;background:rgba(0,0,0,0.85);flex-shrink:0}
