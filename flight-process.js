@@ -122,11 +122,6 @@ const FlightProcess = {
         <div id="process-bottom">
           <button onclick="FlightProcess.skip()" id="process-skip-btn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;color:rgba(255,255,255,0.7);padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px">${this._t('fpSkip')}</button>
         </div>
-        <div id="process-mic" style="position:fixed;right:12px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:10">
-          <button onclick="window.speechSynthesis.cancel();FlightProcess._toggleMute();" style="width:44px;height:44px;border-radius:50%;background:rgba(220,50,50,0.7);border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">⏹</button>
-          <button onclick="FlightProcess._openMicInOverlay();" style="width:50px;height:50px;border-radius:50%;background:rgba(245,166,35,0.9);border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(245,166,35,0.35)">🎤</button>
-          <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.55)">${this._t('mic') || '질문'}</span>
-        </div>
       </div>
     `;
 
@@ -397,10 +392,18 @@ const FlightProcess = {
   // ── 오버레이 보이기/숨기기 ──
   _showOverlay() {
     if (this._overlayEl) this._overlayEl.style.display = 'flex';
+    // 기존 마이크 버튼 표시 (pointer-events:none 덕분에 클릭 가능)
+    const micW = document.getElementById('mic-wrap');
+    if (micW) micW.classList.add('show');
   },
 
   _hideOverlay() {
     if (this._overlayEl) this._overlayEl.style.display = 'none';
+    // 마이크 닫기
+    const micW = document.getElementById('mic-wrap');
+    if (micW) micW.classList.remove('show');
+    const vbx = document.getElementById('voice-box');
+    if (vbx) vbx.classList.remove('show');
     window.speechSynthesis.cancel();
   }
 };

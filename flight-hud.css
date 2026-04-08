@@ -9,6 +9,10 @@
   backdrop-filter: blur(20px);
   align-items: center;
   justify-content: center;
+  pointer-events: none;
+}
+#process-overlay > * {
+  pointer-events: auto;
 }
 
 #process-container {
