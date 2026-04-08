@@ -1,0 +1,16 @@
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+video/
+images/
+*.png
+*.jpg
+*.jpeg
+*.PNG
+*.JPG
+*.pdf
+*.PDF
+server/node_modules/
+node_modules/
