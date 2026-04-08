@@ -272,10 +272,11 @@ const FlightProcess = {
     const stepNames = steps.map(s => `${s.label}: ${s.detail}`).join('\n');
     App._flightProcessContext = `지금 비행 전 점검 단계입니다.\n체크리스트:\n${stepNames}`;
 
-    // 기존 마이크 UI 열기 (이동 가능, 음성 입력, 텍스트 입력 모두 지원)
+    // 기존 마이크+음성박스 UI 열기
     const micWrap = document.getElementById('mic-wrap');
+    const voiceBox = document.getElementById('voice-box');
     if (micWrap) micWrap.classList.add('show');
-    App.toggleMic();
+    if (voiceBox) voiceBox.classList.add('show');
   },
 
   // ── 음성 차단 토글 ──
