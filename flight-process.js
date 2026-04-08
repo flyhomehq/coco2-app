@@ -124,7 +124,7 @@ const FlightProcess = {
         </div>
         <div id="process-mic" style="position:fixed;right:12px;bottom:80px;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:10">
           <button onclick="window.speechSynthesis.cancel();FlightProcess._toggleMute();" style="width:44px;height:44px;border-radius:50%;background:rgba(220,50,50,0.7);border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">⏹</button>
-          <button onclick="if(typeof App!=='undefined')App.toggleMic();" style="width:50px;height:50px;border-radius:50%;background:rgba(245,166,35,0.9);border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(245,166,35,0.35)">🎤</button>
+          <button onclick="FlightProcess._openMicInOverlay();" style="width:50px;height:50px;border-radius:50%;background:rgba(245,166,35,0.9);border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(245,166,35,0.35)">🎤</button>
           <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.55)">${this._t('mic') || '질문'}</span>
         </div>
       </div>
@@ -359,6 +359,39 @@ const FlightProcess = {
     const btn = document.getElementById('process-mute-btn');
     if (btn) btn.textContent = this._muted ? this._t('fpMuted') : this._t('fpMute');
     if (this._muted) window.speechSynthesis.cancel();
+  },
+
+  // ── 마이크 버튼 → 오버레이 안에 질문 입력창 열기 ──
+  _openMicInOverlay() {
+    let detailEl = document.getElementById('process-detail');
+    let titleEl = document.getElementById('process-detail-title');
+    let textEl = document.getElementById('process-detail-text');
+    if (!detailEl) {
+      const container = document.getElementById('process-container');
+      if (!container) return;
+      detailEl = document.createElement('div');
+      detailEl.id = 'process-detail';
+      detailEl.style.display = 'none';
+      detailEl.innerHTML = '<div id="process-detail-title"></div><div id="process-detail-text"></div>';
+      container.appendChild(detailEl);
+      titleEl = document.getElementById('process-detail-title');
+      textEl = document.getElementById('process-detail-text');
+    }
+    if (!titleEl || !textEl) return;
+
+    titleEl.textContent = this._t('fpAskTitle') || '🐣 코코에게 질문하세요';
+    textEl.innerHTML = `
+      <textarea id="pq-input" rows="2" placeholder="${this._t('fpInputPH') || '질문을 입력하세요'}"
+        style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;font-family:inherit;box-sizing:border-box;resize:none;margin-bottom:8px"></textarea>
+      <div style="display:flex;gap:8px">
+        <button onclick="FlightProcess._submitQ()" style="flex:1;padding:12px;border-radius:10px;border:none;background:rgba(96,165,250,0.7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit">${this._t('fpSend') || '→ 코코에게 물어보기'}</button>
+        <button onclick="FlightProcess._hideDetail()" style="padding:12px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;cursor:pointer;font-family:inherit">${this._t('fpClose') || '닫기'}</button>
+      </div>`;
+    detailEl.style.display = 'block';
+    // 스크롤을 아래로
+    const container = document.getElementById('process-container');
+    if (container) container.scrollTop = container.scrollHeight;
+    setTimeout(() => { const input = document.getElementById('pq-input'); if (input) { input.focus(); input.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); FlightProcess._submitQ(); } }; } }, 100);
   },
 
   // ── 오버레이 보이기/숨기기 ──
