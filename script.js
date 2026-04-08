@@ -300,6 +300,8 @@ const App = {
   _camStream: null,
 
   init() {
+    // 제스처 가이드 리셋 (앱 시작할 때마다 다시 보이게)
+    localStorage.removeItem('cpos_hide_gesture');
     // 배경 설정
     document.getElementById('bg').style.backgroundImage = 'none'; // 첫 페이지는 영상 배경
     // 코코 기본 이미지
