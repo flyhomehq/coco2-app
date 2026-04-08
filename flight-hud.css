@@ -157,11 +157,6 @@
   background: transparent;
 }
 
-/* PIP이 열리면 HUD 위에 표시되도록 보장 */
-#pip-wrap.show {
-  z-index: 400 !important;
-}
-
 #flight-hud > * {
   pointer-events: auto;
 }

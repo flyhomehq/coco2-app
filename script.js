@@ -1174,17 +1174,7 @@ const App = {
     const isOpening = !wrap.classList.contains('show');
     wrap.classList.toggle('show');
     if (isOpening) {
-      // PIP 열기 전 상태 저장
-      const processOverlay = document.getElementById('process-overlay');
-      const flightHud = document.getElementById('flight-hud');
-      this._pipPrevState = {
-        processVisible: processOverlay && processOverlay.style.display !== 'none' && processOverlay.offsetParent !== null,
-        hudVisible: flightHud && flightHud.style.display !== 'none' && flightHud.offsetParent !== null
-      };
-      // PIP 열 때: 다른 오버레이 숨기기
-      if (processOverlay) processOverlay.style.display = 'none';
-      if (flightHud) flightHud.style.display = 'none';
-      // 캡처 결과 닫고, 포커스 숨기고, 카메라 표시
+      // PIP 열 때: 캡처 결과 닫고, 포커스 숨기고, 카메라 표시
       document.getElementById('pip-capture-result').style.display = 'none';
       document.getElementById('pip-focus').style.display = 'none';
       this._captureMode = false;
@@ -1204,18 +1194,6 @@ const App = {
   closePip() {
     window.speechSynthesis.cancel();
     document.getElementById('pip-wrap').classList.remove('show');
-    // PIP 열기 전에 보이던 것만 복원
-    if (this._pipPrevState) {
-      if (this._pipPrevState.processVisible) {
-        const po = document.getElementById('process-overlay');
-        if (po) po.style.display = 'flex';
-      }
-      if (this._pipPrevState.hudVisible) {
-        const hud = document.getElementById('flight-hud');
-        if (hud) hud.style.display = 'block';
-      }
-      this._pipPrevState = null;
-    }
   },
   // 시뮬 제어 확인 단계
   _pendingSimAction: null,
