@@ -553,7 +553,7 @@ const App = {
       if (hud) hud.style.display = 'none';
       // 과정 표시가 있으면 다시 보여주기
       if (typeof FlightProcess !== 'undefined' && FlightProcess._overlayEl) {
-        FlightProcess._overlayEl.style.display = 'flex';
+        FlightProcess._showOverlay();
         return; // 페이지 전환 안 함, 과정 표시로 복귀
       }
     }
