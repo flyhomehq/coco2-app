@@ -1187,9 +1187,11 @@ const App = {
     const wrap = document.getElementById('pip-wrap');
     const isOpening = !wrap.classList.contains('show');
     wrap.classList.toggle('show');
-    // PIP 열/닫을 때 상단바 숨기기/복원
+    // PIP 열/닫을 때 상단바+HUD 숨기기/복원
     const topbar = document.getElementById('topbar');
+    const flightHud = document.getElementById('flight-hud');
     if (topbar) topbar.style.display = isOpening ? 'none' : '';
+    if (flightHud) flightHud.style.display = isOpening ? 'none' : (FlightHUD.flightActive ? 'block' : 'none');
     if (isOpening) {
       // PIP 열 때: 캡처 결과 닫고, 포커스 숨기고, 카메라 표시
       document.getElementById('pip-capture-result').style.display = 'none';
