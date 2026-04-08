@@ -265,10 +265,25 @@ const FlightProcess = {
 
   // ── 코코에게 질문하기 (과정 페이지 안에서 처리) ──
   _askCoco() {
-    const detailEl = document.getElementById('process-detail');
-    const titleEl = document.getElementById('process-detail-title');
-    const textEl = document.getElementById('process-detail-text');
-    if (!detailEl || !titleEl || !textEl) return;
+    let detailEl = document.getElementById('process-detail');
+    let titleEl = document.getElementById('process-detail-title');
+    let textEl = document.getElementById('process-detail-text');
+
+    // detail 요소가 없으면 다시 찾기 (오버레이가 재생성된 경우)
+    if (!detailEl) {
+      const overlay = document.getElementById('process-overlay');
+      if (!overlay) return;
+      // detail 영역 없으면 직접 생성
+      const d = document.createElement('div');
+      d.id = 'process-detail';
+      d.innerHTML = '<div id="process-detail-title"></div><div id="process-detail-text"></div><button onclick="FlightProcess._hideDetail()" style="margin-top:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:12px">확인</button>';
+      const container = document.getElementById('process-container');
+      if (container) container.appendChild(d);
+      detailEl = d;
+      titleEl = document.getElementById('process-detail-title');
+      textEl = document.getElementById('process-detail-text');
+    }
+    if (!titleEl || !textEl) return;
 
     titleEl.textContent = '🐣 코코에게 질문하세요';
     textEl.innerHTML = `
