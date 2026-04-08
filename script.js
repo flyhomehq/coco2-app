@@ -1370,7 +1370,12 @@ const App = {
     const isOpening = !wrap.classList.contains('show');
     wrap.classList.toggle('show');
     if (isOpening) {
-      // PIP 열 때: 캡처 결과 닫고, 포커스 숨기고, 카메라 표시
+      // PIP 열 때: 다른 오버레이 숨기기
+      const processOverlay = document.getElementById('process-overlay');
+      if (processOverlay) processOverlay.style.display = 'none';
+      const flightHud = document.getElementById('flight-hud');
+      if (flightHud) flightHud.style.display = 'none';
+      // 캡처 결과 닫고, 포커스 숨기고, 카메라 표시
       document.getElementById('pip-capture-result').style.display = 'none';
       document.getElementById('pip-focus').style.display = 'none';
       this._captureMode = false;
@@ -1390,6 +1395,11 @@ const App = {
   closePip() {
     window.speechSynthesis.cancel();
     document.getElementById('pip-wrap').classList.remove('show');
+    // PIP 닫을 때: 숨겼던 오버레이 복원
+    const processOverlay = document.getElementById('process-overlay');
+    if (processOverlay && FlightProcess._currentScenario) processOverlay.style.display = 'flex';
+    const flightHud = document.getElementById('flight-hud');
+    if (flightHud && FlightHUD.flightActive) flightHud.style.display = 'block';
   },
   // 시뮬 제어 확인 단계
   _pendingSimAction: null,
