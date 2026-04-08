@@ -1213,8 +1213,19 @@ const App = {
   closePip() {
     window.speechSynthesis.cancel();
     document.getElementById('pip-wrap').classList.remove('show');
+    // 상단바 복원
     const topbar = document.getElementById('topbar');
     if (topbar) topbar.style.display = '';
+    // HUD 복원 (비행 중이었으면)
+    const flightHud = document.getElementById('flight-hud');
+    if (flightHud && typeof FlightHUD !== 'undefined' && FlightHUD.flightActive) {
+      flightHud.style.display = 'block';
+    }
+    // 과정 오버레이 복원 (과정 진행 중이었으면)
+    const processOverlay = document.getElementById('process-overlay');
+    if (processOverlay && typeof FlightProcess !== 'undefined' && FlightProcess._currentScenario && !FlightHUD.flightActive) {
+      processOverlay.style.display = 'flex';
+    }
   },
   // 시뮬 제어 확인 단계
   _pendingSimAction: null,
