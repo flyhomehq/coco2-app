@@ -263,21 +263,72 @@ const FlightProcess = {
     window.speechSynthesis.cancel();
   },
 
-  // ── 코코에게 질문하기 (오버레이 유지 + 마이크 UI를 위에 띄움) ──
+  // ── 코코에게 질문하기 (과정 페이지 안 자체 질문창) ──
   _askCoco() {
-    if (typeof App === 'undefined') return;
+    const detailEl = document.getElementById('process-detail');
+    const titleEl = document.getElementById('process-detail-title');
+    const textEl = document.getElementById('process-detail-text');
+    if (!detailEl || !titleEl || !textEl) return;
 
-    // 마이크 버튼 + 음성 질문창을 강제로 표시 (오버레이는 그대로)
-    const micWrap = document.getElementById('mic-wrap');
-    const vb = document.getElementById('voice-box');
+    titleEl.textContent = '🐣 코코에게 질문하세요';
+    textEl.innerHTML = `
+      <textarea id="pq-input" rows="2" placeholder="말씀하시거나 여기를 탭해서 직접 입력하세요"
+        style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;font-family:inherit;box-sizing:border-box;resize:none;margin-bottom:8px"></textarea>
+      <div style="display:flex;gap:8px">
+        <button onclick="FlightProcess._submitQ()" style="flex:1;padding:12px;border-radius:10px;border:none;background:rgba(96,165,250,0.7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit">→ 코코에게 물어보기</button>
+        <button onclick="FlightProcess._hideDetail()" style="padding:12px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;cursor:pointer;font-family:inherit">닫기</button>
+      </div>`;
+    detailEl.style.display = 'block';
 
-    if (micWrap) micWrap.classList.add('show');
+    setTimeout(() => {
+      const input = document.getElementById('pq-input');
+      if (input) {
+        input.focus();
+        input.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); FlightProcess._submitQ(); } };
+      }
+    }, 100);
+  },
 
-    // voice-box가 안 열려있으면 toggleMic으로 열기 (STT 시작됨)
-    if (vb && !vb.classList.contains('show')) {
-      vb.classList.add('show');
-      App._startSTT();
-    }
+  _submitQ() {
+    const input = document.getElementById('pq-input');
+    if (!input || !input.value.trim()) return;
+    const question = input.value.trim();
+
+    const titleEl = document.getElementById('process-detail-title');
+    const textEl = document.getElementById('process-detail-text');
+    titleEl.textContent = '🐣 코코가 답변 중...';
+    textEl.textContent = '잠시만 기다려주세요...';
+
+    const steps = this.steps[this._currentScenario] || [];
+    const ctx = steps.map(s => `${s.label}: ${s.detail}`).join('\n');
+
+    fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: `당신은 CockpitOS의 AI 비행 비서 코코입니다.\n체크리스트:\n${ctx}\n\n비행 초보자에게 쉽고 친근하게 2~3문장으로 설명하세요.`,
+        messages: [{ role: 'user', content: question }],
+        max_tokens: 300
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      const answer = data.content ? data.content[0].text : (data.error || '답변을 받지 못했어요.');
+      titleEl.textContent = '🐣 코코의 답변';
+      textEl.innerHTML = `<div style="margin-bottom:12px;line-height:1.6">${answer}</div>
+        <button onclick="FlightProcess._askCoco()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(96,165,250,0.4);background:rgba(96,165,250,0.2);color:#60a5fa;cursor:pointer;font-family:inherit;font-size:13px;margin-bottom:6px">다시 질문하기</button>
+        <button onclick="FlightProcess._hideDetail()" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);cursor:pointer;font-family:inherit;font-size:12px">닫기</button>`;
+      if (!FlightProcess._muted) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(answer);
+        u.lang = 'ko-KR'; u.rate = 0.92; u.pitch = 1.05;
+        window.speechSynthesis.speak(u);
+      }
+    })
+    .catch(() => {
+      titleEl.textContent = '🐣 코코';
+      textEl.textContent = 'API 키가 설정되지 않았어요. server/.env 파일을 확인해주세요.';
+    });
   },
 
   // ── 음성 차단 토글 ──
