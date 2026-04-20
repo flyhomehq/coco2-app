@@ -305,6 +305,12 @@ const FlightHUD = {
     setVal('hud-phase-icon', phase.icon);
     setVal('hud-phase-text', phase.text);
 
+    // 단계별 코칭 카드 (단계가 바뀔 때만 업데이트)
+    if (data.phase !== this._lastPhase) {
+      this._lastPhase = data.phase;
+      this._showPhaseCoaching(data.phase);
+    }
+
     // 경고 처리
     if (judgment && judgment.messages.length > 0) {
       this._showWarnings(judgment);
@@ -397,6 +403,32 @@ const FlightHUD = {
       titleEl.textContent = '👀 시범 완료!';
       msgEl.innerHTML = `<div style="color:#4ade80;font-weight:700">시범이 끝났어요!</div>` +
         `<div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:4px">이제 직접 해보시겠어요?</div>`;
+    }
+  },
+
+  // ── 비행 단계별 코칭 카드 ──
+  _lastPhase: null,
+  _showPhaseCoaching(phase) {
+    const coaching = document.getElementById('hud-coaching');
+    const msgEl = document.getElementById('hud-coaching-message');
+    const titleEl = document.getElementById('hud-coaching-title');
+    if (!coaching || !msgEl) return;
+
+    const key = 'coach' + phase.charAt(0).toUpperCase() + phase.slice(1);
+    const msg = this._t(key);
+    if (!msg || msg === key) return; // 번역 키 없으면 표시 안 함
+
+    coaching.style.display = 'block';
+    if (titleEl) titleEl.textContent = '🐣 ' + this._t('cocoName');
+    msgEl.innerHTML = `<div style="line-height:1.5">${msg}</div>`;
+
+    // 음성 안내 (ttsOn 일 때)
+    if (typeof App !== 'undefined' && App.ttsOn) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(msg.replace(/[🅿️🔑🚕🛫📈✈️📉🛬🎯✅]/g, ''));
+      u.lang = {ko:'ko-KR',en:'en-US',ja:'ja-JP',zh:'zh-CN'}[App.lang] || 'ko-KR';
+      u.rate = 0.92; u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
     }
   },
 
