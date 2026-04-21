@@ -126,6 +126,11 @@ const FlightHUD = {
 
       case 'flight-stopped':
         console.log('[HUD] 비행 종료');
+        if (msg.report) this._showReport(msg.report);
+        break;
+
+      case 'flight-report':
+        if (msg.report) this._showReport(msg.report);
         break;
 
       case 'demo-started':
@@ -430,6 +435,106 @@ const FlightHUD = {
       u.rate = 0.92; u.pitch = 1.05;
       window.speechSynthesis.speak(u);
     }
+  },
+
+  // ── 비행 리포트 화면 ──
+  _showReport(report) {
+    // 기존 리포트 제거
+    const old = document.getElementById('flight-report');
+    if (old) old.remove();
+
+    const stars = (n) => '⭐'.repeat(n) + '☆'.repeat(5 - n);
+    const s = report.scores || {};
+
+    const report_el = document.createElement('div');
+    report_el.id = 'flight-report';
+    report_el.style.cssText = 'position:fixed;inset:0;z-index:500;background:rgba(5,10,24,0.97);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto';
+    report_el.innerHTML = `
+      <div style="max-width:500px;width:100%;background:rgba(15,20,40,0.95);border:2px solid rgba(245,166,35,0.6);border-radius:20px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.5)">
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:48px;margin-bottom:8px">📊</div>
+          <div style="font-size:24px;font-weight:900;color:#FFD700">${this._t('reportTitle') || '비행 리포트'}</div>
+          <div style="font-size:32px;margin-top:8px">${stars(report.totalStars || 0)}</div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.6);margin-top:4px">${this._t('reportScore') || '총점'}: ${report.totalScore || 0}/5</div>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:14px;margin-bottom:12px">
+          <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:6px">${this._t('reportSummary') || '비행 요약'}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
+            <div>⏱ ${this._t('reportTime') || '비행시간'}: <b>${Math.round((report.flightTime || 0) / 60)}분</b></div>
+            <div>🔝 ${this._t('reportMaxAlt') || '최고고도'}: <b>${report.maxAltitude || 0}ft</b></div>
+            <div>💨 ${this._t('reportMaxSpd') || '최고속도'}: <b>${report.maxSpeed || 0}kt</b></div>
+            <div>⛽ ${this._t('reportFuel') || '연료사용'}: <b>${report.fuelUsed || 0}%</b></div>
+          </div>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:14px;margin-bottom:12px">
+          <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:8px">${this._t('reportScores') || '항목별 점수'}</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span>${this._t('reportAltKeep') || '고도 유지'}</span><span>${stars(s.altitudeKeeping?.stars || 0)}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span>${this._t('reportSpdCtrl') || '속도 조절'}</span><span>${stars(s.speedControl?.stars || 0)}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span>${this._t('reportBankCtrl') || '선회'}</span><span>${stars(s.bankControl?.stars || 0)}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span>${this._t('reportLanding') || '착륙'}</span><span>${stars(s.landing?.stars || 0)} ${s.landing?.grade || ''}</span></div>
+          </div>
+        </div>
+
+        <div style="background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);border-radius:12px;padding:14px;margin-bottom:16px">
+          <div style="font-size:13px;line-height:1.6">🐣 ${this._getReportMessage(report)}</div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button onclick="document.getElementById('flight-report').remove();if(typeof App!=='undefined')App.goBack();App.goBack()" style="flex:1;padding:14px;border-radius:12px;border:none;background:rgba(245,166,35,0.8);color:#1a0800;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit">🏠 ${this._t('reportHome') || '메인으로'}</button>
+          <button onclick="document.getElementById('flight-report').remove()" style="padding:14px 20px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;cursor:pointer;font-family:inherit">✕</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(report_el);
+
+    // 음성 안내
+    if (typeof App !== 'undefined' && App.ttsOn) {
+      const msg = this._getReportMessage(report);
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(msg);
+      u.lang = {ko:'ko-KR',en:'en-US',ja:'ja-JP',zh:'zh-CN'}[App.lang] || 'ko-KR';
+      u.rate = 0.92; u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
+    }
+  },
+
+  _getReportMessage(report) {
+    const stars = report.totalStars || 0;
+    const lang = (typeof App !== 'undefined') ? App.lang : 'ko';
+    const msgs = {
+      ko: [
+        '다시 도전해보세요! 연습이 필요해요.',
+        '조금 더 연습하면 잘할 수 있어요!',
+        '좋아요! 잘하고 계세요.',
+        '훌륭해요! 프로 조종사 같아요!',
+        '완벽해요! 정말 대단하세요!'
+      ],
+      en: [
+        'Keep trying! Practice makes perfect.',
+        'A bit more practice and you will do great!',
+        'Nice! You are doing well.',
+        'Excellent! Like a pro pilot!',
+        'Perfect! Amazing flight!'
+      ],
+      ja: [
+        'もう一度挑戦！練習が必要です。',
+        'もう少し練習すればうまくできます！',
+        'いいですね！うまくやっています。',
+        '素晴らしい！プロ級です！',
+        '完璧です！すごい飛行でした！'
+      ],
+      zh: [
+        '再试一次！需要更多练习。',
+        '再练习一下就能做得很好！',
+        '不错！做得很好。',
+        '出色！像专业飞行员！',
+        '完美！太棒了！'
+      ]
+    };
+    return (msgs[lang] || msgs.ko)[Math.min(stars, 4)];
   },
 
   // ── 관광지 카드 ──

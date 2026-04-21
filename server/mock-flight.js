@@ -180,7 +180,7 @@ class MockFlightProvider extends EventEmitter {
     };
   }
 
-  startFlight(scenarioName = 'default') {
+  startFlight(scenarioName = 'default', autoFly = true) {
     this._scenario = SCENARIOS[scenarioName] || SCENARIOS.default;
     this._state = this._getInitialState();
     this._state.heading = this._scenario.departure.rwyHdg;
@@ -189,10 +189,28 @@ class MockFlightProvider extends EventEmitter {
     this._flightTime = 0;
     this._recording = [];
     this._phase = 'parked';
+    this._autoFly = autoFly;
+
+    // 자동 비행 모드: 준비 상태로 시작 (엔진 켜짐, 플랩 10도, 브레이크 해제)
+    if (autoFly) {
+      this._state.masterBattery = true;
+      this._state.avionicsMaster = true;
+      this._state.beaconLight = true;
+      this._state.navLight = true;
+      this._state.strobeLight = true;
+      this._state.engineRunning = true;
+      this._state.engineRPM = 800;
+      this._state.oilPressure = 60;
+      this._state.flaps = 10;
+      this._state.parkingBrake = false;
+      this._phase = 'ready';
+    }
 
     // 0.5초마다 데이터 업데이트
     if (this._intervalId) clearInterval(this._intervalId);
     this._intervalId = setInterval(() => {
+      // 자동 비행: AI 파일럿 시뮬레이션
+      if (this._autoFly) this._autoFlyStep();
       this._update();
       this._flightTime += 0.5;
       this._state.flightTime = this._flightTime;
@@ -206,7 +224,82 @@ class MockFlightProvider extends EventEmitter {
       this.emit('data', { ...this._state });
     }, 500);
 
-    console.log(`[Flight] 비행 시작: ${scenarioName}`);
+    console.log(`[Flight] 비행 시작: ${scenarioName} (autoFly: ${autoFly})`);
+  }
+
+  // ── 자동 비행 시뮬레이션 (AI 파일럿 역할) ──
+  _autoFlyStep() {
+    const s = this._state;
+    const t = this._flightTime;
+
+    // 0~3초: 정지 (ready 상태)
+    if (t < 3) {
+      s.throttle = 0;
+      return;
+    }
+
+    // 3~15초: 택싱 (스로틀 20%, 속도 5~15kt)
+    if (t < 15) {
+      s.throttle = 20;
+      this._phase = 'taxi';
+      return;
+    }
+
+    // 15~45초: 이륙 롤 (스로틀 100%, 속도 증가)
+    if (t < 45) {
+      s.throttle = 100;
+      // 55kt 넘으면 자동 이륙
+      if (s.airspeed >= 55 && s.onGround) {
+        s.pitch = 7;
+      }
+      return;
+    }
+
+    // 45~90초: 상승 (목표 고도까지)
+    if (t < 90) {
+      s.throttle = 85;
+      if (s.altitude < (this._scenario?.cruiseAlt || 3000) - 100) {
+        s.pitch = 5; // 상승 자세 유지
+      } else {
+        s.pitch = 0; // 수평 전환
+      }
+      return;
+    }
+
+    // 90~600초: 순항 (AI 파일럿 OFF, 사용자가 조종)
+    if (t < 600) {
+      // 수평 비행 유지 (최소한의 보조)
+      if (s.altitude < (this._scenario?.cruiseAlt || 3000) - 200) s.pitch = 1;
+      else if (s.altitude > (this._scenario?.cruiseAlt || 3000) + 200) s.pitch = -1;
+      else s.pitch *= 0.9;
+      s.throttle = 70;
+      return;
+    }
+
+    // 600~660초: 하강
+    if (t < 660) {
+      s.throttle = 40;
+      s.pitch = -3;
+      this._phase = 'descent';
+      return;
+    }
+
+    // 660~720초: 접근
+    if (t < 720) {
+      s.throttle = 30;
+      s.pitch = -2;
+      if (s.flaps < 30) s.flaps = 30;
+      return;
+    }
+
+    // 720초+: 착륙
+    if (s.altitude > 0) {
+      s.throttle = 15;
+      s.pitch = -1;
+    } else {
+      s.throttle = 0;
+      this._phase = 'landed';
+    }
   }
 
   stopFlight() {

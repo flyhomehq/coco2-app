@@ -79,6 +79,11 @@ const T = {
     coachApproach:'🛬 접근 중. 플랩 내리고 속도 90kt로 유지하세요.',
     coachLanding:'🎯 착륙 중! 기수 살짝 들고 부드럽게 내려주세요.',
     coachLanded:'✅ 착륙 완료! 수고하셨어요. 멋진 비행이었습니다!',
+    // 비행 리포트
+    reportTitle:'비행 리포트', reportScore:'총점', reportSummary:'비행 요약',
+    reportTime:'비행시간', reportMaxAlt:'최고고도', reportMaxSpd:'최고속도', reportFuel:'연료사용',
+    reportScores:'항목별 점수', reportAltKeep:'고도 유지', reportSpdCtrl:'속도 조절',
+    reportBankCtrl:'선회', reportLanding:'착륙', reportHome:'메인으로',
   },
   en: {
     back:'Back', settings:'Settings', cocoName:'Coco',
@@ -151,6 +156,10 @@ const T = {
     coachApproach:'🛬 On approach. Flaps down, maintain 90kt.',
     coachLanding:'🎯 Landing! Slight nose-up, smooth touchdown.',
     coachLanded:'✅ Landed! Great flight, well done!',
+    reportTitle:'Flight Report', reportScore:'Total Score', reportSummary:'Flight Summary',
+    reportTime:'Duration', reportMaxAlt:'Max Altitude', reportMaxSpd:'Max Speed', reportFuel:'Fuel Used',
+    reportScores:'Scores', reportAltKeep:'Altitude Keeping', reportSpdCtrl:'Speed Control',
+    reportBankCtrl:'Bank Control', reportLanding:'Landing', reportHome:'Home',
   },
   ja: {
     back:'戻る', settings:'設定', cocoName:'ココ',
@@ -223,6 +232,10 @@ const T = {
     coachApproach:'🛬 進入中。フラップ下げ、90kt維持。',
     coachLanding:'🎯 着陸中！機首少し上げて、滑らかに着地。',
     coachLanded:'✅ 着陸完了！素晴らしい飛行でした！',
+    reportTitle:'飛行レポート', reportScore:'総合点', reportSummary:'飛行サマリー',
+    reportTime:'飛行時間', reportMaxAlt:'最高高度', reportMaxSpd:'最高速度', reportFuel:'燃料使用',
+    reportScores:'項目別点数', reportAltKeep:'高度維持', reportSpdCtrl:'速度制御',
+    reportBankCtrl:'旋回', reportLanding:'着陸', reportHome:'ホーム',
   },
   zh: {
     back:'返回', settings:'设置', cocoName:'可可',
@@ -295,6 +308,10 @@ const T = {
     coachApproach:'🛬 进近中。放下襟翼，保持90节。',
     coachLanding:'🎯 着陆中！机头略抬起，平稳接地。',
     coachLanded:'✅ 着陆完成！飞行很棒，辛苦了！',
+    reportTitle:'飞行报告', reportScore:'总分', reportSummary:'飞行摘要',
+    reportTime:'飞行时间', reportMaxAlt:'最高高度', reportMaxSpd:'最高速度', reportFuel:'燃料使用',
+    reportScores:'项目评分', reportAltKeep:'高度保持', reportSpdCtrl:'速度控制',
+    reportBankCtrl:'转弯', reportLanding:'着陆', reportHome:'首页',
   },
 };
 

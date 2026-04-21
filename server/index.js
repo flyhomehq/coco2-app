@@ -88,9 +88,17 @@ wss.on('connection', (ws) => {
           break;
 
         case 'stop-flight':
-          // 비행 종료
-          flightProvider.stopFlight();
-          ws.send(JSON.stringify({ type: 'flight-stopped' }));
+          // 비행 종료 + 리포트 생성
+          const recording = flightProvider.stopFlight();
+          const report = flightJudge.generateReport(recording || []);
+          ws.send(JSON.stringify({ type: 'flight-stopped', report }));
+          break;
+
+        case 'get-report':
+          // 리포트 요청 (현재 기록 기준)
+          const currentRecording = flightProvider.getRecording();
+          const currentReport = flightJudge.generateReport(currentRecording || []);
+          ws.send(JSON.stringify({ type: 'flight-report', report: currentReport }));
           break;
 
         case 'demo-start':
