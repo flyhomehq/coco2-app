@@ -1,0 +1,54 @@
+[
+  {
+    "id": "room-1",
+    "ownerId": "host-1",
+    "name": "2층 마스터룸",
+    "location": "서울 중랑구",
+    "pcMac": "00:00:00:00:00:01",
+    "pcIp": "192.168.1.101",
+    "msfsVersion": "2024",
+    "aircraft": "Cessna 172",
+    "status": "idle",
+    "currentGuest": null,
+    "flightActive": false
+  },
+  {
+    "id": "room-2",
+    "ownerId": "host-1",
+    "name": "2층 시티뷰",
+    "location": "서울 중랑구",
+    "pcMac": "00:00:00:00:00:02",
+    "pcIp": "192.168.1.102",
+    "msfsVersion": "2024",
+    "aircraft": "Cessna 172",
+    "status": "idle",
+    "currentGuest": null,
+    "flightActive": false
+  },
+  {
+    "id": "room-3",
+    "ownerId": "host-1",
+    "name": "3층 스위트",
+    "location": "서울 중랑구",
+    "pcMac": "00:00:00:00:00:03",
+    "pcIp": "192.168.1.103",
+    "msfsVersion": "2024",
+    "aircraft": "Boeing 737",
+    "status": "idle",
+    "currentGuest": null,
+    "flightActive": false
+  },
+  {
+    "id": "room-4",
+    "ownerId": "host-2",
+    "name": "해운대 뷰",
+    "location": "부산 해운대",
+    "pcMac": "00:00:00:00:00:04",
+    "pcIp": "192.168.1.104",
+    "msfsVersion": "2024",
+    "aircraft": "Cessna 172",
+    "status": "idle",
+    "currentGuest": null,
+    "flightActive": false
+  }
+]
