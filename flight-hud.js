@@ -15,6 +15,38 @@ const FlightHUD = {
     const lang = (typeof App !== 'undefined') ? App.lang : 'ko';
     return (T && T[lang] && T[lang][key]) ? T[lang][key] : (T && T.ko && T.ko[key]) || key;
   },
+
+  // ── AI에게 비행 상태 기반 질문 (Claude API) ──
+  askAI(question) {
+    const data = this.lastData || {};
+    const lang = (typeof App !== 'undefined') ? App.lang : 'ko';
+
+    const context = `현재 비행 상태:
+- 단계: ${data.phase || 'unknown'}
+- 고도: ${Math.round(data.altitude || 0)}ft
+- 속도: ${Math.round(data.airspeed || 0)}kt
+- 방향: ${Math.round(data.heading || 0)}°
+- 연료: ${Math.round(data.fuel || 100)}%
+- 위치: ${data.latitude?.toFixed(4) || '?'}, ${data.longitude?.toFixed(4) || '?'}
+${data.nearbyPOI ? `- 근처: ${data.nearbyPOI.name}` : ''}`;
+
+    const systemPrompts = {
+      ko: `당신은 CockpitOS의 AI 비행 비서 코코입니다.\n${context}\n비행 초보자에게 쉽고 친근하게 2~3문장으로 답변하세요. 지금 상황에 맞는 실용적인 조언을 주세요.`,
+      en: `You are Coco, CockpitOS AI flight assistant.\n${context}\nGive practical advice in 2-3 friendly sentences for a beginner, matching current situation.`,
+      ja: `あなたはCockpitOSのAI飛行アシスタント、ココです。\n${context}\n初心者に優しく2-3文で、現状に合う実用的なアドバイスを。`,
+      zh: `你是CockpitOS的AI飞行助手可可。\n${context}\n用2-3句友好语气给初学者实用建议，贴合当前情况。`
+    };
+
+    return fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: systemPrompts[lang] || systemPrompts.ko,
+        messages: [{ role: 'user', content: question }],
+        max_tokens: 400
+      })
+    }).then(r => r.json());
+  },
   hudElement: null,
 
   // ── WebSocket 연결 ──

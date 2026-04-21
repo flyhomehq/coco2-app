@@ -227,48 +227,46 @@ class MockFlightProvider extends EventEmitter {
     console.log(`[Flight] 비행 시작: ${scenarioName} (autoFly: ${autoFly})`);
   }
 
-  // ── 자동 비행 시뮬레이션 (AI 파일럿 역할) ──
+  // ── 자동 비행 시뮬레이션 (AI 파일럿 역할) — 데모용 빠른 버전 ──
   _autoFlyStep() {
     const s = this._state;
     const t = this._flightTime;
 
-    // 0~3초: 정지 (ready 상태)
-    if (t < 3) {
+    // 0~2초: 정지 (ready 상태)
+    if (t < 2) {
       s.throttle = 0;
       return;
     }
 
-    // 3~15초: 택싱 (스로틀 20%, 속도 5~15kt)
-    if (t < 15) {
-      s.throttle = 20;
+    // 2~8초: 택싱 (속도 빠르게 상승)
+    if (t < 8) {
+      s.throttle = 50;
       this._phase = 'taxi';
       return;
     }
 
-    // 15~45초: 이륙 롤 (스로틀 100%, 속도 증가)
-    if (t < 45) {
+    // 8~20초: 이륙 롤 (스로틀 100%, 빠른 이륙)
+    if (t < 20) {
       s.throttle = 100;
-      // 55kt 넘으면 자동 이륙
       if (s.airspeed >= 55 && s.onGround) {
-        s.pitch = 7;
+        s.pitch = 8;
       }
       return;
     }
 
-    // 45~90초: 상승 (목표 고도까지)
-    if (t < 90) {
-      s.throttle = 85;
+    // 20~40초: 상승 (빠르게 3000ft까지)
+    if (t < 40) {
+      s.throttle = 95;
       if (s.altitude < (this._scenario?.cruiseAlt || 3000) - 100) {
-        s.pitch = 5; // 상승 자세 유지
+        s.pitch = 8; // 빠른 상승
       } else {
-        s.pitch = 0; // 수평 전환
+        s.pitch = 0;
       }
       return;
     }
 
-    // 90~600초: 순항 (AI 파일럿 OFF, 사용자가 조종)
-    if (t < 600) {
-      // 수평 비행 유지 (최소한의 보조)
+    // 40~150초: 순항 (110초, 관광 중심)
+    if (t < 150) {
       if (s.altitude < (this._scenario?.cruiseAlt || 3000) - 200) s.pitch = 1;
       else if (s.altitude > (this._scenario?.cruiseAlt || 3000) + 200) s.pitch = -1;
       else s.pitch *= 0.9;
@@ -276,26 +274,26 @@ class MockFlightProvider extends EventEmitter {
       return;
     }
 
-    // 600~660초: 하강
-    if (t < 660) {
+    // 150~180초: 하강
+    if (t < 180) {
       s.throttle = 40;
-      s.pitch = -3;
+      s.pitch = -5;
       this._phase = 'descent';
       return;
     }
 
-    // 660~720초: 접근
-    if (t < 720) {
-      s.throttle = 30;
-      s.pitch = -2;
+    // 180~210초: 접근
+    if (t < 210) {
+      s.throttle = 25;
+      s.pitch = -3;
       if (s.flaps < 30) s.flaps = 30;
       return;
     }
 
-    // 720초+: 착륙
+    // 210초+: 착륙
     if (s.altitude > 0) {
-      s.throttle = 15;
-      s.pitch = -1;
+      s.throttle = 10;
+      s.pitch = -2;
     } else {
       s.throttle = 0;
       this._phase = 'landed';
@@ -510,8 +508,8 @@ class MockFlightProvider extends EventEmitter {
         console.log(`[Flight] 착륙! 터치다운 속도: ${Math.abs(s.verticalSpeed).toFixed(0)} fpm`);
       }
 
-      // 위치 이동 (간단한 위경도 변화)
-      const spdKmh = s.groundSpeed * 1.852; // kt → km/h
+      // 위치 이동 (데모용 5배 가속)
+      const spdKmh = s.groundSpeed * 1.852 * 5; // kt → km/h × 5 (빠른 데모)
       const hdgRad = (s.heading * Math.PI) / 180;
       s.latitude += (Math.cos(hdgRad) * spdKmh / 111000) * dt;
       s.longitude += (Math.sin(hdgRad) * spdKmh / (111000 * Math.cos(s.latitude * Math.PI / 180))) * dt;
