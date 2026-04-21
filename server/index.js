@@ -15,6 +15,9 @@ const { MockFlightProvider } = require('./mock-flight');
 const { FlightJudge } = require('./flight-judge');
 const { createApiProxy } = require('./api-proxy');
 const { createAdsApi } = require('./ads-api');
+const { PCLauncher } = require('./pc-launcher');
+const { Watchdog } = require('./watchdog');
+const { Notifier } = require('./notifications');
 
 const app = express();
 const server = http.createServer(app);
@@ -46,6 +49,53 @@ app.get('/api/status', (req, res) => {
 const wss = new WebSocketServer({ server, path: '/ws' });
 const flightProvider = new MockFlightProvider();
 const flightJudge = new FlightJudge();
+
+// ── PC 자동화 시스템 (Phase 2+ 실제 사용) ──
+const pcLauncher = new PCLauncher({ mockMode: true });
+const notifier = new Notifier({ mockMode: true });
+const watchdog = new Watchdog();
+watchdog.setDependencies({ flightProvider, pcLauncher, notifier });
+watchdog.start();
+
+// Watchdog 이벤트 → 호스트 대시보드 전송
+watchdog.on('health-change', (health) => {
+  wss.clients.forEach(c => {
+    if (c.readyState === 1) {
+      c.send(JSON.stringify({ type: 'watchdog-health', health }));
+    }
+  });
+});
+watchdog.on('host-alert', (alert) => {
+  notifier.alert({ level: 'ERROR', ...alert });
+});
+
+// 부팅 시퀀스 이벤트 → 해당 클라이언트에 전송
+function sendBootEvents(ws) {
+  const onState = ({ state, step }) => {
+    if (ws.readyState === 1) ws.send(JSON.stringify({ type: 'boot-state', state, step }));
+  };
+  const onProgress = (progress) => {
+    if (ws.readyState === 1) ws.send(JSON.stringify({ type: 'boot-progress', progress }));
+  };
+  const onReady = () => {
+    if (ws.readyState === 1) ws.send(JSON.stringify({ type: 'boot-ready' }));
+  };
+  const onError = (err) => {
+    if (ws.readyState === 1) ws.send(JSON.stringify({ type: 'boot-error', error: { message: err.message } }));
+  };
+  pcLauncher.on('state-change', onState);
+  pcLauncher.on('progress', onProgress);
+  pcLauncher.on('msfs-ready', onReady);
+  pcLauncher.on('error', onError);
+
+  // 정리
+  ws.on('close', () => {
+    pcLauncher.off('state-change', onState);
+    pcLauncher.off('progress', onProgress);
+    pcLauncher.off('msfs-ready', onReady);
+    pcLauncher.off('error', onError);
+  });
+}
 
 wss.on('connection', (ws) => {
   console.log('[WS] 클라이언트 연결됨');
@@ -136,6 +186,31 @@ wss.on('connection', (ws) => {
             flightProvider.rewindTo(msg.type || 'runway');
           }
           ws.send(JSON.stringify({ type: 'rewound', to: msg.type }));
+          break;
+
+        case 'boot-start':
+          // PC 부팅 시퀀스 시작
+          sendBootEvents(ws);
+          pcLauncher.bootSequence();
+          break;
+
+        case 'boot-abort':
+          pcLauncher.abort();
+          break;
+
+        case 'host-call':
+          // 게스트가 호스트 호출
+          notifier.alert({
+            level: 'WARNING',
+            message: `게스트가 도움 요청: ${msg.reason || '알 수 없음'}`,
+            room: msg.room || 'unknown'
+          });
+          ws.send(JSON.stringify({ type: 'host-called' }));
+          break;
+
+        case 'watchdog-status':
+          // Watchdog 상태 조회
+          ws.send(JSON.stringify({ type: 'watchdog-status', status: watchdog.getHealth() }));
           break;
       }
     } catch (e) {

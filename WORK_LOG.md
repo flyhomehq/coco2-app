@@ -20,6 +20,21 @@
   - 되돌리기 시스템 (활주로/공중/접근)
   - 우측 고정 빠른 버튼 (속도/되돌리기)
 
+**추가 완료 (3차 세션 — PC 자동화)**:
+- server/pc-launcher.js — Wake-on-LAN + MSFS 실행 + 프로세스 감시 (400줄, 주석 상세)
+- server/simconnect-provider.js — SimConnect 연결 구조 (350줄, MSFS 구매 후 TODO만 채우면 됨)
+- server/watchdog.js — 자동 복구 시스템 (4단계 에스컬레이션)
+- server/notifications.js — 호스트 알림 (8개 채널: 로그/대시보드/웹푸시/카카오/SMS/이메일/Slack/Discord)
+- flight-boot.js — 부팅 시퀀스 UI (4개국어, 단계별 진행률)
+- 서버 통합: WebSocket으로 boot-start, host-call, watchdog-status 명령 추가
+
+**미래 개발자에게 상세 주석 포함**:
+- 각 파일 최상단에 역할/맥락/미래 개발자 가이드
+- 모든 TODO 항목에 구현 예시 코드 포함
+- 실제 API 연동 방법 (패키지명, 예제)
+- 비용 정보 (각 서비스별)
+- 업계 표준 대안 제시
+
 **추가 완료 (2차 세션)**:
 - 관광지 데이터 확장 (서울 30개, 제주 20개)
 - 호스트 광고 관리 시스템 (ads-api.js + host-dashboard.html + flight-ads.js)
