@@ -362,6 +362,10 @@ const App = {
     this._setText('cfg-jeju-lbl', t.cfgJeju);
     this._setText('cfg-day-lbl', t.cfgDay);
     this._setText('cfg-night-lbl', t.cfgNight);
+    this._setText('cfg-speed-lbl', t.cfgSpeed || '진행 속도');
+    this._setText('cfg-fast-lbl', t.cfgFast || '빠른');
+    this._setText('cfg-normal-lbl', t.cfgNormal || '표준');
+    this._setText('cfg-real-lbl', t.cfgReal || '리얼');
     this._setText('cfg-go', t.cfgGo);
     // 교육모드
     this._setText('p32-title', t.p32title);
@@ -612,10 +616,25 @@ const App = {
       this.flightLoc = val;
       document.getElementById('cfg-seoul').classList.toggle('active', val === 'seoul');
       document.getElementById('cfg-jeju').classList.toggle('active', val === 'jeju');
-    } else {
+    } else if (type === 'time') {
       this.flightTime = val;
       document.getElementById('cfg-day').classList.toggle('active', val === 'day');
       document.getElementById('cfg-night').classList.toggle('active', val === 'night');
+    } else if (type === 'speed') {
+      this.flightSpeed = val;
+      document.getElementById('cfg-fast').classList.toggle('active', val === 'fast');
+      document.getElementById('cfg-normal').classList.toggle('active', val === 'normal');
+      document.getElementById('cfg-real').classList.toggle('active', val === 'real');
+      // 속도 설명 업데이트
+      const hint = document.getElementById('cfg-speed-hint');
+      if (hint) {
+        const hints = {
+          fast:   { ko:'관광객 추천 (3~5분)',  en:'Tourist (3-5 min)',  ja:'観光客向け (3-5分)', zh:'游客推荐 (3-5分)' },
+          normal: { ko:'균형잡힌 (10~15분)',   en:'Balanced (10-15 min)', ja:'バランス (10-15分)', zh:'均衡 (10-15分)' },
+          real:   { ko:'시뮬 마니아 (30분+)',  en:'Realistic (30+ min)', ja:'リアル (30分+)', zh:'真实 (30分+)' }
+        };
+        hint.textContent = (hints[val] || hints.fast)[this.lang] || hints[val].ko;
+      }
     }
   },
 
@@ -665,6 +684,10 @@ const App = {
       const settingsBtn = document.querySelector('#topbar .btn:nth-child(2)');
       if (settingsBtn) settingsBtn.style.display = 'none';
 
+      // 속도 모드 저장 (HUD가 사용)
+      if (typeof FlightHUD !== 'undefined') {
+        FlightHUD.speedMode = this.flightSpeed || 'fast';
+      }
       // 과정 표시 시작 (원클릭 → 단계별 진행 → 완료 후 HUD)
       FlightProcess.start(scenario);
     } else {

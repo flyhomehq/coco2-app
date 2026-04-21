@@ -117,6 +117,22 @@ wss.on('connection', (ws) => {
           const checklist = flightProvider.getChecklist(msg.phase);
           ws.send(JSON.stringify({ type: 'checklist', phase: msg.phase, items: checklist }));
           break;
+
+        case 'set-speed':
+          // 속도 배율 변경 (Mock용 - 실제 SimConnect에서는 R키 자동 입력으로 구현)
+          if (flightProvider.setSpeedMultiplier) {
+            flightProvider.setSpeedMultiplier(msg.multiplier || 1);
+          }
+          ws.send(JSON.stringify({ type: 'speed-set', multiplier: msg.multiplier }));
+          break;
+
+        case 'rewind':
+          // 되돌리기 (Mock용 - 실제 SimConnect에서는 위치 리셋 명령)
+          if (flightProvider.rewindTo) {
+            flightProvider.rewindTo(msg.type || 'runway');
+          }
+          ws.send(JSON.stringify({ type: 'rewound', to: msg.type }));
+          break;
       }
     } catch (e) {
       console.error('[WS] 메시지 파싱 에러:', e.message);

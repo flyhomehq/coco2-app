@@ -122,6 +122,7 @@ class MockFlightProvider extends EventEmitter {
     this._scenario = null;
     this._phase = 'parked'; // parked, taxi, takeoff, climb, cruise, descent, approach, landing, landed
     this._recording = []; // 비행 기록 (리포트용)
+    this._speedMultiplier = 1;
 
     // 비행기 상태
     this._state = this._getInitialState();
@@ -308,6 +309,82 @@ class MockFlightProvider extends EventEmitter {
     this.stopDemo();
     console.log('[Flight] 비행 종료');
     return this._recording;
+  }
+
+  // ── 속도 배율 설정 (Mock) ──
+  setSpeedMultiplier(mult) {
+    this._speedMultiplier = Math.max(0.5, Math.min(10, mult || 1));
+    console.log(`[Flight] 속도 배율: ${this._speedMultiplier}x`);
+    // interval 속도 재조정
+    if (this._intervalId) {
+      clearInterval(this._intervalId);
+      const baseMs = 500;
+      const newMs = Math.max(50, Math.round(baseMs / this._speedMultiplier));
+      this._intervalId = setInterval(() => {
+        if (this._autoFly) this._autoFlyStep();
+        this._update();
+        this._flightTime += 0.5 * this._speedMultiplier;
+        this._state.flightTime = this._flightTime;
+        this._state.phase = this._phase;
+        if (Math.floor(this._flightTime) % 5 === 0) {
+          this._recording.push({ ...this._state, time: this._flightTime });
+        }
+        this.emit('data', { ...this._state });
+      }, newMs);
+    }
+  }
+
+  // ── 되돌리기 (Mock) ──
+  rewindTo(type) {
+    const s = this._state;
+    const dep = this._scenario?.departure || AIRPORTS.RKSS;
+
+    if (type === 'runway') {
+      // 활주로 시작 위치
+      s.latitude = dep.lat;
+      s.longitude = dep.lon;
+      s.altitude = 0;
+      s.altitudeAGL = 0;
+      s.airspeed = 0;
+      s.verticalSpeed = 0;
+      s.heading = dep.rwyHdg;
+      s.onGround = true;
+      s.pitch = 0;
+      s.bank = 0;
+      this._phase = 'ready';
+      // 엔진은 켜진 상태로
+      s.engineRunning = true;
+      s.throttle = 0;
+      this._flightTime = 2; // ready 직후
+    } else if (type === 'air') {
+      // 이륙 직후 공중
+      s.latitude = dep.lat;
+      s.longitude = dep.lon;
+      s.altitude = 500;
+      s.altitudeAGL = 500;
+      s.airspeed = 90;
+      s.verticalSpeed = 500;
+      s.heading = dep.rwyHdg;
+      s.onGround = false;
+      s.pitch = 5;
+      this._phase = 'climb';
+      s.engineRunning = true;
+      s.throttle = 85;
+      this._flightTime = 30;
+    } else if (type === 'approach') {
+      // 착륙 접근
+      s.altitude = 1500;
+      s.altitudeAGL = 1500;
+      s.airspeed = 90;
+      s.verticalSpeed = -500;
+      s.onGround = false;
+      s.pitch = -2;
+      s.flaps = 30;
+      this._phase = 'approach';
+      s.throttle = 30;
+      this._flightTime = 180;
+    }
+    console.log(`[Flight] 되돌리기: ${type}`);
   }
 
   // 시범 모드: 코코가 자동으로 조작

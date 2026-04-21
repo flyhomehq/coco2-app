@@ -126,6 +126,15 @@
         <button class="cfg-btn" id="cfg-night" onclick="App.setFlight('time','night',this)">🌃 <span id="cfg-night-lbl">야간</span></button>
       </div>
     </div>
+    <div class="cfg-section">
+      <div class="cfg-label" id="cfg-speed">🚀 <span id="cfg-speed-lbl">진행 속도</span></div>
+      <div class="cfg-btns">
+        <button class="cfg-btn active" id="cfg-fast" onclick="App.setFlight('speed','fast',this)">🚀 <span id="cfg-fast-lbl">빠른</span></button>
+        <button class="cfg-btn" id="cfg-normal" onclick="App.setFlight('speed','normal',this)">✈️ <span id="cfg-normal-lbl">표준</span></button>
+        <button class="cfg-btn" id="cfg-real" onclick="App.setFlight('speed','real',this)">🎓 <span id="cfg-real-lbl">리얼</span></button>
+      </div>
+      <div class="cfg-hint" style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px" id="cfg-speed-hint">관광객 추천 (3~5분)</div>
+    </div>
     <button class="cfg-start" id="cfg-go" onclick="App.startFlight()">🛫 비행 시작!</button>
   </div>
 </div>
@@ -599,5 +608,6 @@
     <script src="flight-map.js?v=20260422"></script>
     <script src="flight-audio.js?v=20260422"></script>
     <script src="flight-badges.js?v=20260422"></script>
+    <script src="flight-assist.js?v=20260422"></script>
 </body>
 </html><!-- cache bust Sun Apr  5 02:57:25     2026 -->
