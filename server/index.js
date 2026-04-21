@@ -18,6 +18,7 @@ const { createAdsApi } = require('./ads-api');
 const { PCLauncher } = require('./pc-launcher');
 const { Watchdog } = require('./watchdog');
 const { Notifier } = require('./notifications');
+const { createHostsApi } = require('./hosts-api');
 
 const app = express();
 const server = http.createServer(app);
@@ -35,6 +36,9 @@ app.use('/api', createApiProxy());
 
 // ── 광고 API ──
 app.use('/api', createAdsApi());
+
+// ── 호스트/방 API (Multi-tenant) ──
+app.use('/api', createHostsApi());
 
 // ── 서버 상태 확인 ──
 app.get('/api/status', (req, res) => {

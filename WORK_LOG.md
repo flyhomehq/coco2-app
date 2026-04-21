@@ -20,6 +20,18 @@
   - 되돌리기 시스템 (활주로/공중/접근)
   - 우측 고정 빠른 버튼 (속도/되돌리기)
 
+**추가 완료 (4차 세션 — 호스트 대시보드 완성)**:
+- server/hosts-api.js — 멀티호스트 로그인 + 방 관리 (Multi-tenant)
+- 호스트별 데이터 격리 (각자 자기 방만 보임)
+- 테스트 계정 2개 (daeung, partnerA)
+- host-dashboard.html 대폭 확장:
+  * 로그인 화면
+  * 3개 탭 (방 상태 / 광고 관리 / 알림 로그)
+  * 방별 실시간 상태 (10초 주기)
+  * 원격 제어 버튼 (전원/재시작)
+  * Watchdog 알림 실시간 수신
+  * 통계 카드 (방 수, 활성, 알림)
+
 **추가 완료 (3차 세션 — PC 자동화)**:
 - server/pc-launcher.js — Wake-on-LAN + MSFS 실행 + 프로세스 감시 (400줄, 주석 상세)
 - server/simconnect-provider.js — SimConnect 연결 구조 (350줄, MSFS 구매 후 TODO만 채우면 됨)

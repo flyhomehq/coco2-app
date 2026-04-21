@@ -13,24 +13,75 @@
     color: #fff;
     min-height: 100vh;
   }
-  .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+  /* 로그인 화면 */
+  .login-bg {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0a0f1c 0%, #1a2040 100%);
+  }
+  .login-box {
+    background: rgba(20,28,48,0.9);
+    border: 1px solid rgba(100,200,255,0.3);
+    border-radius: 18px;
+    padding: 32px;
+    max-width: 400px;
+    width: 92%;
+  }
+  .login-title { font-size: 24px; font-weight: 900; color: #FFD060; margin-bottom: 8px; text-align: center; }
+  .login-sub { font-size: 13px; color: rgba(255,255,255,0.6); text-align: center; margin-bottom: 24px; }
+  .login-hint {
+    background: rgba(100,200,255,0.1);
+    border: 1px solid rgba(100,200,255,0.3);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 16px;
+  }
+
+  /* 헤더 */
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
+    padding-bottom: 16px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
   }
-  h1 { font-size: 26px; margin: 0; }
-  .subtitle { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+  h1 { font-size: 22px; margin: 0; }
+  .subtitle { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .host-info { font-size: 12px; color: rgba(255,255,255,0.6); text-align: right; }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .tab {
+    padding: 10px 18px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    border-bottom: 2px solid transparent;
+  }
+  .tab.active {
+    color: #FFD060;
+    border-bottom-color: #FFD060;
+    font-weight: 700;
+  }
+
+  /* 버튼 */
   .btn {
     background: rgba(245,166,35,0.8);
     color: #1a0800;
     border: none;
     border-radius: 10px;
     padding: 10px 20px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
@@ -40,303 +91,500 @@
     color: #fff;
     border: 1px solid rgba(255,255,255,0.2);
   }
-  .btn-danger {
-    background: rgba(220,50,50,0.7);
-    color: #fff;
-  }
-  .ad-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
-  .ad-card {
-    background: rgba(20,28,48,0.8);
-    border: 1px solid rgba(100,200,255,0.3);
-    border-radius: 14px;
-    padding: 18px;
-  }
-  .ad-card h3 { margin: 0 0 8px 0; color: #60c8ff; font-size: 16px; }
-  .ad-card .sponsor { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
-  .ad-card .desc { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; margin-bottom: 10px; }
-  .ad-card .meta {
-    font-size: 11px;
-    color: rgba(255,255,255,0.4);
-    padding-top: 8px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    margin-top: 8px;
-  }
-  .ad-card .actions { margin-top: 10px; display: flex; gap: 6px; }
-  .ad-card button { font-size: 12px; padding: 6px 12px; }
-  .modal-bg {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.8);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-  }
-  .modal-bg.open { display: flex; }
-  .modal {
-    background: #0a0f1c;
-    border: 1px solid rgba(100,200,255,0.3);
-    border-radius: 14px;
-    padding: 24px;
-    max-width: 600px;
-    width: 95%;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  .form-row { margin-bottom: 14px; }
-  .form-row label { display: block; font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
-  .form-row input, .form-row textarea {
+  .btn-danger { background: rgba(220,50,50,0.7); color: #fff; }
+  .btn-small { padding: 6px 12px; font-size: 12px; }
+
+  /* 입력 */
+  input, textarea, select {
     width: 100%;
     padding: 10px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 8px;
     color: #fff;
     font-size: 13px;
     font-family: inherit;
+    margin-bottom: 10px;
   }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-  .empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: rgba(255,255,255,0.4);
-    font-size: 14px;
-  }
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .stat-card {
-    background: rgba(20,28,48,0.8);
-    border-radius: 10px;
-    padding: 16px;
-    text-align: center;
-  }
-  .stat-card .value { font-size: 28px; font-weight: 900; color: #FFD060; }
+
+  /* 통계 카드 */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: rgba(20,28,48,0.8); border-radius: 10px; padding: 14px; text-align: center; }
+  .stat-card .value { font-size: 24px; font-weight: 900; color: #FFD060; }
   .stat-card .label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+  /* 방 카드 */
+  .room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 14px; }
+  .room-card {
+    background: rgba(20,28,48,0.8);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 16px;
+    position: relative;
+  }
+  .room-card.active { border-color: rgba(74,222,128,0.5); box-shadow: 0 0 20px rgba(74,222,128,0.15); }
+  .room-card.error { border-color: rgba(239,68,68,0.5); box-shadow: 0 0 20px rgba(239,68,68,0.15); }
+  .room-card h3 { margin: 0 0 4px 0; font-size: 16px; }
+  .room-card .loc { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+  .status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .status-idle { background: rgba(100,100,100,0.3); color: #ccc; }
+  .status-active { background: rgba(74,222,128,0.2); color: #4ade80; }
+  .status-booting { background: rgba(255,215,0,0.2); color: #FFD060; }
+  .status-error { background: rgba(239,68,68,0.2); color: #ef4444; }
+  .room-info { font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 10px; }
+  .room-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* 알림 로그 */
+  .log-list {
+    background: rgba(20,28,48,0.5);
+    border-radius: 10px;
+    padding: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 20px;
+  }
+  .log-entry {
+    font-size: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    gap: 10px;
+  }
+  .log-time { color: rgba(255,255,255,0.4); white-space: nowrap; }
+  .log-level-INFO { color: rgba(255,255,255,0.7); }
+  .log-level-WARNING { color: #FFD060; }
+  .log-level-ERROR { color: #ef4444; }
+
+  /* 모달 */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 100; }
+  .modal-bg.open { display: flex; }
+  .modal { background: #0a0f1c; border: 1px solid rgba(100,200,255,0.3); border-radius: 14px; padding: 24px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; }
+
+  /* 광고 카드 (기존) */
+  .ad-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 12px; }
+  .ad-card { background: rgba(20,28,48,0.8); border: 1px solid rgba(100,200,255,0.3); border-radius: 12px; padding: 14px; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .empty { text-align: center; padding: 40px; color: rgba(255,255,255,0.4); }
+
+  @media (max-width: 600px) {
+    .header { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .tab { padding: 8px 12px; font-size: 12px; }
+  }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <div>
-      <h1>🏠 CockpitOS 호스트 대시보드</h1>
-      <div class="subtitle">FLY:HOME 광고 및 컨텐츠 관리</div>
-    </div>
-    <button class="btn" onclick="openAddModal()">+ 광고 추가</button>
-  </div>
 
-  <div class="stats">
-    <div class="stat-card">
-      <div class="value" id="stat-total">0</div>
-      <div class="label">등록 광고</div>
+<!-- 로그인 화면 -->
+<div id="login-screen" class="login-bg">
+  <div class="login-box">
+    <div class="login-title">🏠 CockpitOS</div>
+    <div class="login-sub">호스트 대시보드 로그인</div>
+    <div class="login-hint">
+      <b>테스트 계정:</b><br>
+      • daeung@flyhome.com (대웅님 - 방 3개)<br>
+      • partnerA@flyhome.com (파트너 A - 방 1개)
     </div>
-    <div class="stat-card">
-      <div class="value" id="stat-active">0</div>
-      <div class="label">활성 광고</div>
-    </div>
-    <div class="stat-card">
-      <div class="value" id="stat-regions">0</div>
-      <div class="label">광고 지역</div>
-    </div>
+    <input id="login-email" type="email" placeholder="이메일 입력" value="daeung@flyhome.com">
+    <button class="btn" onclick="login()" style="width:100%">로그인</button>
   </div>
-
-  <div id="ad-list" class="ad-list"></div>
-  <div id="empty" class="empty" style="display:none">아직 광고가 없습니다. "+ 광고 추가" 버튼을 눌러 시작하세요.</div>
 </div>
 
-<div id="modal-bg" class="modal-bg" onclick="if(event.target===this)closeModal()">
+<!-- 대시보드 메인 -->
+<div id="dashboard" style="display:none">
+<div class="container">
+
+  <div class="header">
+    <div>
+      <h1>🏠 CockpitOS 대시보드</h1>
+      <div class="subtitle" id="host-company"></div>
+    </div>
+    <div class="host-info">
+      <div id="host-name"></div>
+      <div style="margin-top:4px"><button class="btn btn-secondary btn-small" onclick="logout()">로그아웃</button></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('rooms', this)">🏠 방 상태</button>
+    <button class="tab" onclick="switchTab('ads', this)">📢 광고 관리</button>
+    <button class="tab" onclick="switchTab('logs', this)">📋 알림 로그</button>
+  </div>
+
+  <!-- 방 상태 탭 -->
+  <div id="tab-rooms" class="tab-content active">
+    <div class="stats">
+      <div class="stat-card"><div class="value" id="s-rooms-total">0</div><div class="label">총 방 수</div></div>
+      <div class="stat-card"><div class="value" id="s-rooms-active">0</div><div class="label">활성 비행</div></div>
+      <div class="stat-card"><div class="value" id="s-today-flights">0</div><div class="label">오늘 비행</div></div>
+      <div class="stat-card"><div class="value" id="s-alerts">0</div><div class="label">알림</div></div>
+    </div>
+
+    <div id="room-list" class="room-grid"></div>
+    <div id="rooms-empty" class="empty" style="display:none">등록된 방이 없습니다.</div>
+
+    <button class="btn" style="margin-top:16px" onclick="openAddRoom()">+ 방 추가</button>
+  </div>
+
+  <!-- 광고 관리 탭 -->
+  <div id="tab-ads" class="tab-content">
+    <div class="stats">
+      <div class="stat-card"><div class="value" id="s-ads-total">0</div><div class="label">등록 광고</div></div>
+      <div class="stat-card"><div class="value" id="s-ads-active">0</div><div class="label">활성 광고</div></div>
+    </div>
+    <button class="btn" onclick="openAddAd()" style="margin-bottom:14px">+ 광고 추가</button>
+    <div id="ad-list" class="ad-list"></div>
+    <div id="ads-empty" class="empty" style="display:none">아직 광고가 없습니다.</div>
+  </div>
+
+  <!-- 알림 로그 탭 -->
+  <div id="tab-logs" class="tab-content">
+    <div id="log-list" class="log-list"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- 방 추가/수정 모달 -->
+<div id="room-modal-bg" class="modal-bg" onclick="if(event.target===this)closeRoomModal()">
   <div class="modal">
-    <h2 id="modal-title" style="margin-top:0">광고 추가</h2>
-    <div class="form-row">
-      <label>제목 (한국어) *</label>
-      <input id="f-title-ko" placeholder="예: 남산타워 야경 관람">
+    <h2 id="room-modal-title" style="margin-top:0">방 추가</h2>
+    <label>방 이름 *</label>
+    <input id="rf-name" placeholder="예: 2층 마스터룸">
+    <label>위치</label>
+    <input id="rf-location" placeholder="예: 서울 중랑구">
+    <label>PC MAC 주소</label>
+    <input id="rf-mac" placeholder="AA:BB:CC:DD:EE:FF">
+    <label>PC IP 주소</label>
+    <input id="rf-ip" placeholder="192.168.1.100">
+    <label>항공기</label>
+    <input id="rf-aircraft" placeholder="Cessna 172" value="Cessna 172">
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-secondary" onclick="closeRoomModal()">취소</button>
+      <button class="btn" onclick="saveRoom()">저장</button>
     </div>
-    <div class="form-grid">
-      <div class="form-row">
-        <label>제목 (영어)</label>
-        <input id="f-title-en" placeholder="Namsan Tower Night View">
-      </div>
-      <div class="form-row">
-        <label>제목 (일본어)</label>
-        <input id="f-title-ja" placeholder="南山タワー夜景観賞">
-      </div>
+  </div>
+</div>
+
+<!-- 광고 모달 -->
+<div id="ad-modal-bg" class="modal-bg" onclick="if(event.target===this)closeAdModal()">
+  <div class="modal">
+    <h2 id="ad-modal-title" style="margin-top:0">광고 추가</h2>
+    <label>제목 (한국어) *</label>
+    <input id="af-title-ko" placeholder="남산타워 야경">
+    <label>설명</label>
+    <textarea id="af-desc-ko" rows="2" placeholder="야간 예약 20% 할인"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label>위도</label><input id="af-lat" type="number" step="0.0001" placeholder="37.5512"></div>
+      <div><label>경도</label><input id="af-lon" type="number" step="0.0001" placeholder="126.9882"></div>
     </div>
-    <div class="form-row">
-      <label>제목 (중국어)</label>
-      <input id="f-title-zh" placeholder="南山塔夜景">
-    </div>
-    <div class="form-row">
-      <label>설명 (한국어)</label>
-      <textarea id="f-desc-ko" rows="2" placeholder="예: 야간 예약 20% 할인"></textarea>
-    </div>
-    <div class="form-grid">
-      <div class="form-row">
-        <label>위도 *</label>
-        <input id="f-lat" type="number" step="0.0001" placeholder="37.5512">
-      </div>
-      <div class="form-row">
-        <label>경도 *</label>
-        <input id="f-lon" type="number" step="0.0001" placeholder="126.9882">
-      </div>
-    </div>
-    <div class="form-grid">
-      <div class="form-row">
-        <label>반경 (km)</label>
-        <input id="f-radius" type="number" step="0.1" value="2">
-      </div>
-      <div class="form-row">
-        <label>우선순위 (1~10)</label>
-        <input id="f-priority" type="number" value="5">
-      </div>
-    </div>
-    <div class="form-row">
-      <label>링크 URL</label>
-      <input id="f-link" placeholder="https://...">
-    </div>
-    <div class="form-row">
-      <label>스폰서</label>
-      <input id="f-sponsor" placeholder="서울시, 한국관광공사 등">
-    </div>
-    <div class="form-grid">
-      <div class="form-row">
-        <label>게시 시작일</label>
-        <input id="f-start" type="date">
-      </div>
-      <div class="form-row">
-        <label>게시 종료일</label>
-        <input id="f-end" type="date">
-      </div>
-    </div>
-    <div class="form-actions">
-      <button class="btn btn-secondary" onclick="closeModal()">취소</button>
+    <label>링크</label>
+    <input id="af-link" placeholder="https://...">
+    <label>스폰서</label>
+    <input id="af-sponsor" placeholder="서울타워">
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-secondary" onclick="closeAdModal()">취소</button>
       <button class="btn" onclick="saveAd()">저장</button>
     </div>
   </div>
 </div>
 
 <script>
-let editingId = null;
+let TOKEN = localStorage.getItem('cpos_host_token') || null;
+let HOST = null;
+let editingRoomId = null;
+let editingAdId = null;
+let LOGS = [];
+let WS = null;
 
-async function loadAds() {
-  const ads = await fetch('/api/ads').then(r => r.json());
-  renderAds(ads);
-  updateStats(ads);
+// ─── 로그인 ───
+async function login() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) return alert('이메일 입력하세요');
+  const r = await fetch('/api/hosts/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+  const data = await r.json();
+  if (!r.ok) return alert(data.error || '로그인 실패');
+  TOKEN = data.token;
+  HOST = data.host;
+  localStorage.setItem('cpos_host_token', TOKEN);
+  showDashboard();
 }
 
-function renderAds(ads) {
-  const list = document.getElementById('ad-list');
-  const empty = document.getElementById('empty');
-  if (!ads.length) {
+async function logout() {
+  if (TOKEN) {
+    await fetch('/api/hosts/logout', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
+  }
+  TOKEN = null; HOST = null;
+  localStorage.removeItem('cpos_host_token');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+async function checkLogin() {
+  if (!TOKEN) return false;
+  try {
+    const r = await fetch('/api/hosts/me', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    if (!r.ok) return false;
+    HOST = await r.json();
+    return true;
+  } catch { return false; }
+}
+
+async function showDashboard() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('host-name').textContent = HOST.name + ' (' + HOST.role + ')';
+  document.getElementById('host-company').textContent = HOST.company;
+  await loadRooms();
+  await loadAds();
+  connectWS();
+}
+
+// ─── 방 관리 ───
+async function loadRooms() {
+  const r = await fetch('/api/rooms', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const rooms = await r.json();
+  renderRooms(rooms);
+  document.getElementById('s-rooms-total').textContent = rooms.length;
+  document.getElementById('s-rooms-active').textContent = rooms.filter(r => r.flightActive).length;
+}
+
+function renderRooms(rooms) {
+  const list = document.getElementById('room-list');
+  const empty = document.getElementById('rooms-empty');
+  if (!rooms.length) {
     list.innerHTML = '';
     empty.style.display = 'block';
     return;
   }
   empty.style.display = 'none';
-  list.innerHTML = ads.map(ad => `
-    <div class="ad-card">
-      <div class="sponsor">📢 ${ad.sponsor || '광고'}</div>
-      <h3>${ad.title_ko || ad.title || ''}</h3>
-      <div class="desc">${ad.desc_ko || ad.desc || ''}</div>
-      <div class="meta">
-        📍 ${(ad.lat||0).toFixed(4)}, ${(ad.lon||0).toFixed(4)} · 반경 ${ad.radius || 2}km<br>
-        📅 ${ad.startDate || ''} ~ ${ad.endDate || ''}<br>
-        ⭐ 우선순위 ${ad.priority || 0} · ${ad.enabled ? '✅ 활성' : '⏸ 중지'}
+  list.innerHTML = rooms.map(r => {
+    const statusMap = {
+      idle: { label:'⚫ 대기', cls:'status-idle' },
+      booting: { label:'🟡 준비 중', cls:'status-booting' },
+      active: { label:'🟢 비행 중', cls:'status-active' },
+      error: { label:'🔴 오류', cls:'status-error' }
+    };
+    const st = statusMap[r.status] || statusMap.idle;
+    const cardCls = r.status === 'active' ? 'active' : (r.status === 'error' ? 'error' : '');
+    return `
+      <div class="room-card ${cardCls}">
+        <h3>${r.name}</h3>
+        <div class="loc">📍 ${r.location || '-'}</div>
+        <div class="status-badge ${st.cls}">${st.label}</div>
+        <div class="room-info">
+          ✈️ ${r.aircraft || '-'}<br>
+          💻 ${r.pcIp || '-'}<br>
+          ${r.flightActive ? '🎮 비행 중...' : ''}
+        </div>
+        <div class="room-actions">
+          <button class="btn btn-secondary btn-small" onclick="remoteControl('${r.id}','boot')">🔌 전원</button>
+          <button class="btn btn-secondary btn-small" onclick="remoteControl('${r.id}','restart')">🔄 재시작</button>
+          <button class="btn btn-secondary btn-small" onclick='editRoom(${JSON.stringify(r)})'>✏️</button>
+          <button class="btn btn-danger btn-small" onclick="deleteRoom('${r.id}')">🗑</button>
+        </div>
       </div>
-      <div class="actions">
-        <button class="btn btn-secondary" onclick='editAd(${JSON.stringify(ad)})'>✏️ 수정</button>
-        <button class="btn btn-danger" onclick="deleteAd('${ad.id}')">🗑 삭제</button>
+    `;
+  }).join('');
+}
+
+function openAddRoom() {
+  editingRoomId = null;
+  document.getElementById('room-modal-title').textContent = '방 추가';
+  ['rf-name','rf-location','rf-mac','rf-ip'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('rf-aircraft').value = 'Cessna 172';
+  document.getElementById('room-modal-bg').classList.add('open');
+}
+
+function editRoom(room) {
+  editingRoomId = room.id;
+  document.getElementById('room-modal-title').textContent = '방 수정';
+  document.getElementById('rf-name').value = room.name || '';
+  document.getElementById('rf-location').value = room.location || '';
+  document.getElementById('rf-mac').value = room.pcMac || '';
+  document.getElementById('rf-ip').value = room.pcIp || '';
+  document.getElementById('rf-aircraft').value = room.aircraft || 'Cessna 172';
+  document.getElementById('room-modal-bg').classList.add('open');
+}
+
+function closeRoomModal() { document.getElementById('room-modal-bg').classList.remove('open'); }
+
+async function saveRoom() {
+  const data = {
+    name: document.getElementById('rf-name').value,
+    location: document.getElementById('rf-location').value,
+    pcMac: document.getElementById('rf-mac').value,
+    pcIp: document.getElementById('rf-ip').value,
+    aircraft: document.getElementById('rf-aircraft').value
+  };
+  if (!data.name) return alert('방 이름 필수');
+  const url = editingRoomId ? '/api/rooms/' + editingRoomId : '/api/rooms';
+  const method = editingRoomId ? 'PUT' : 'POST';
+  await fetch(url, {
+    method, headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + TOKEN },
+    body: JSON.stringify(data)
+  });
+  closeRoomModal();
+  loadRooms();
+}
+
+async function deleteRoom(id) {
+  if (!confirm('삭제하시겠어요?')) return;
+  await fetch('/api/rooms/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  loadRooms();
+}
+
+function remoteControl(roomId, action) {
+  addLog('INFO', `[${roomId}] ${action} 명령 전송 (Mock)`);
+  alert(`원격 제어: ${action}\n(Mock 모드. MSFS 연결 후 실제 작동)`);
+}
+
+// ─── 광고 관리 ───
+async function loadAds() {
+  const r = await fetch('/api/ads');
+  const ads = await r.json();
+  renderAds(ads);
+  document.getElementById('s-ads-total').textContent = ads.length;
+  document.getElementById('s-ads-active').textContent = ads.filter(a => a.enabled).length;
+}
+
+function renderAds(ads) {
+  const list = document.getElementById('ad-list');
+  const empty = document.getElementById('ads-empty');
+  if (!ads.length) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML = ads.map(a => `
+    <div class="ad-card">
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px">📢 ${a.sponsor||''}</div>
+      <h3 style="margin:0 0 6px 0;color:#60c8ff;font-size:15px">${a.title_ko||a.title||''}</h3>
+      <div style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;margin-bottom:8px">${a.desc_ko||''}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:8px">
+        📍 ${(a.lat||0).toFixed(3)},${(a.lon||0).toFixed(3)} · ${a.startDate||''}~${a.endDate||''}
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-secondary btn-small" onclick='editAd(${JSON.stringify(a)})'>수정</button>
+        <button class="btn btn-danger btn-small" onclick="deleteAd('${a.id}')">삭제</button>
       </div>
     </div>
   `).join('');
 }
 
-function updateStats(ads) {
-  const now = new Date().toISOString().split('T')[0];
-  const active = ads.filter(a => a.enabled && a.startDate <= now && a.endDate >= now);
-  const regions = new Set(ads.map(a => `${Math.round(a.lat*10)/10},${Math.round(a.lon*10)/10}`));
-  document.getElementById('stat-total').textContent = ads.length;
-  document.getElementById('stat-active').textContent = active.length;
-  document.getElementById('stat-regions').textContent = regions.size;
-}
-
-function openAddModal() {
-  editingId = null;
-  document.getElementById('modal-title').textContent = '광고 추가';
-  ['f-title-ko','f-title-en','f-title-ja','f-title-zh','f-desc-ko','f-lat','f-lon','f-link','f-sponsor']
-    .forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-radius').value = 2;
-  document.getElementById('f-priority').value = 5;
-  const today = new Date().toISOString().split('T')[0];
-  const endDate = new Date(Date.now() + 90*24*60*60*1000).toISOString().split('T')[0];
-  document.getElementById('f-start').value = today;
-  document.getElementById('f-end').value = endDate;
-  document.getElementById('modal-bg').classList.add('open');
+function openAddAd() {
+  editingAdId = null;
+  document.getElementById('ad-modal-title').textContent = '광고 추가';
+  ['af-title-ko','af-desc-ko','af-lat','af-lon','af-link','af-sponsor'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ad-modal-bg').classList.add('open');
 }
 
 function editAd(ad) {
-  editingId = ad.id;
-  document.getElementById('modal-title').textContent = '광고 수정';
-  document.getElementById('f-title-ko').value = ad.title_ko || '';
-  document.getElementById('f-title-en').value = ad.title_en || '';
-  document.getElementById('f-title-ja').value = ad.title_ja || '';
-  document.getElementById('f-title-zh').value = ad.title_zh || '';
-  document.getElementById('f-desc-ko').value = ad.desc_ko || '';
-  document.getElementById('f-lat').value = ad.lat || '';
-  document.getElementById('f-lon').value = ad.lon || '';
-  document.getElementById('f-radius').value = ad.radius || 2;
-  document.getElementById('f-priority').value = ad.priority || 5;
-  document.getElementById('f-link').value = ad.link || '';
-  document.getElementById('f-sponsor').value = ad.sponsor || '';
-  document.getElementById('f-start').value = ad.startDate || '';
-  document.getElementById('f-end').value = ad.endDate || '';
-  document.getElementById('modal-bg').classList.add('open');
+  editingAdId = ad.id;
+  document.getElementById('ad-modal-title').textContent = '광고 수정';
+  document.getElementById('af-title-ko').value = ad.title_ko||'';
+  document.getElementById('af-desc-ko').value = ad.desc_ko||'';
+  document.getElementById('af-lat').value = ad.lat||'';
+  document.getElementById('af-lon').value = ad.lon||'';
+  document.getElementById('af-link').value = ad.link||'';
+  document.getElementById('af-sponsor').value = ad.sponsor||'';
+  document.getElementById('ad-modal-bg').classList.add('open');
 }
 
-function closeModal() {
-  document.getElementById('modal-bg').classList.remove('open');
-}
+function closeAdModal() { document.getElementById('ad-modal-bg').classList.remove('open'); }
 
 async function saveAd() {
+  const today = new Date().toISOString().split('T')[0];
+  const end = new Date(Date.now()+90*86400000).toISOString().split('T')[0];
   const ad = {
-    id: editingId,
-    title_ko: document.getElementById('f-title-ko').value,
-    title_en: document.getElementById('f-title-en').value,
-    title_ja: document.getElementById('f-title-ja').value,
-    title_zh: document.getElementById('f-title-zh').value,
-    desc_ko: document.getElementById('f-desc-ko').value,
-    lat: parseFloat(document.getElementById('f-lat').value),
-    lon: parseFloat(document.getElementById('f-lon').value),
-    radius: parseFloat(document.getElementById('f-radius').value) || 2,
-    priority: parseInt(document.getElementById('f-priority').value) || 5,
-    link: document.getElementById('f-link').value,
-    sponsor: document.getElementById('f-sponsor').value,
-    startDate: document.getElementById('f-start').value,
-    endDate: document.getElementById('f-end').value,
-    enabled: true
+    id: editingAdId,
+    title_ko: document.getElementById('af-title-ko').value,
+    desc_ko: document.getElementById('af-desc-ko').value,
+    lat: parseFloat(document.getElementById('af-lat').value),
+    lon: parseFloat(document.getElementById('af-lon').value),
+    radius: 2, priority: 5,
+    link: document.getElementById('af-link').value,
+    sponsor: document.getElementById('af-sponsor').value,
+    startDate: today, endDate: end, enabled: true
   };
-  if (!ad.title_ko || isNaN(ad.lat) || isNaN(ad.lon)) {
-    alert('제목, 위도, 경도는 필수입니다');
-    return;
-  }
-  await fetch('/api/ads', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(ad)
-  });
-  closeModal();
+  if (!ad.title_ko || isNaN(ad.lat) || isNaN(ad.lon)) return alert('제목, 위도, 경도 필수');
+  await fetch('/api/ads', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(ad) });
+  closeAdModal();
   loadAds();
 }
 
 async function deleteAd(id) {
-  if (!confirm('정말 삭제하시겠어요?')) return;
-  await fetch('/api/ads/' + id, { method: 'DELETE' });
+  if (!confirm('삭제?')) return;
+  await fetch('/api/ads/'+id, { method:'DELETE' });
   loadAds();
 }
 
-loadAds();
+// ─── 탭 전환 ───
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ─── 실시간 로그 ───
+function connectWS() {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  WS = new WebSocket(`${proto}//${location.host}/ws`);
+  WS.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'watchdog-health') {
+        addLog('WARNING', `시스템 상태: ${msg.health}`);
+        document.getElementById('s-alerts').textContent = LOGS.length;
+      } else if (msg.type === 'host-alert' || msg.type === 'alert') {
+        addLog(msg.level||'INFO', msg.message||'');
+        document.getElementById('s-alerts').textContent = LOGS.filter(l=>l.level!=='INFO').length;
+      }
+    } catch {}
+  };
+}
+
+function addLog(level, message) {
+  const time = new Date().toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  LOGS.unshift({ time, level, message });
+  if (LOGS.length > 100) LOGS = LOGS.slice(0, 100);
+  const list = document.getElementById('log-list');
+  if (list) {
+    list.innerHTML = LOGS.map(l =>
+      `<div class="log-entry"><span class="log-time">${l.time}</span><span class="log-level-${l.level}">[${l.level}]</span><span>${l.message}</span></div>`
+    ).join('') || '<div class="empty">알림 없음</div>';
+  }
+}
+
+// ─── 초기화 ───
+(async () => {
+  if (await checkLogin()) {
+    showDashboard();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+
+  // 방 상태 주기 갱신 (10초)
+  setInterval(() => {
+    if (TOKEN && HOST) loadRooms();
+  }, 10000);
+
+  // 샘플 로그
+  addLog('INFO', '대시보드 로드 완료');
+})();
 </script>
 </body>
 </html>

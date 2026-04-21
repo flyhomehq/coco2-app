@@ -1,0 +1,20 @@
+[
+  {
+    "id": "host-1",
+    "email": "daeung@flyhome.com",
+    "name": "윤대웅",
+    "company": "FLY:HOME 중랑점",
+    "phone": "010-0000-0001",
+    "role": "owner",
+    "createdAt": "2026-04-01"
+  },
+  {
+    "id": "host-2",
+    "email": "partnerA@flyhome.com",
+    "name": "박파트너",
+    "company": "FLY:HOME 부산점",
+    "phone": "010-0000-0002",
+    "role": "partner",
+    "createdAt": "2026-05-01"
+  }
+]
