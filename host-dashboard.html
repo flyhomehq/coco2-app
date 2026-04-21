@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CockpitOS 호스트 대시보드</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: #0a0f1c;
+    color: #fff;
+    min-height: 100vh;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  h1 { font-size: 26px; margin: 0; }
+  .subtitle { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+  .btn {
+    background: rgba(245,166,35,0.8);
+    color: #1a0800;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .btn-danger {
+    background: rgba(220,50,50,0.7);
+    color: #fff;
+  }
+  .ad-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+  .ad-card {
+    background: rgba(20,28,48,0.8);
+    border: 1px solid rgba(100,200,255,0.3);
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .ad-card h3 { margin: 0 0 8px 0; color: #60c8ff; font-size: 16px; }
+  .ad-card .sponsor { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+  .ad-card .desc { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; margin-bottom: 10px; }
+  .ad-card .meta {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 8px;
+  }
+  .ad-card .actions { margin-top: 10px; display: flex; gap: 6px; }
+  .ad-card button { font-size: 12px; padding: 6px 12px; }
+  .modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: #0a0f1c;
+    border: 1px solid rgba(100,200,255,0.3);
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 600px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .form-row { margin-bottom: 14px; }
+  .form-row label { display: block; font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+  .form-row input, .form-row textarea {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(255,255,255,0.4);
+    font-size: 14px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: rgba(20,28,48,0.8);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-card .value { font-size: 28px; font-weight: 900; color: #FFD060; }
+  .stat-card .label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>🏠 CockpitOS 호스트 대시보드</h1>
+      <div class="subtitle">FLY:HOME 광고 및 컨텐츠 관리</div>
+    </div>
+    <button class="btn" onclick="openAddModal()">+ 광고 추가</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="value" id="stat-total">0</div>
+      <div class="label">등록 광고</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" id="stat-active">0</div>
+      <div class="label">활성 광고</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" id="stat-regions">0</div>
+      <div class="label">광고 지역</div>
+    </div>
+  </div>
+
+  <div id="ad-list" class="ad-list"></div>
+  <div id="empty" class="empty" style="display:none">아직 광고가 없습니다. "+ 광고 추가" 버튼을 눌러 시작하세요.</div>
+</div>
+
+<div id="modal-bg" class="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modal-title" style="margin-top:0">광고 추가</h2>
+    <div class="form-row">
+      <label>제목 (한국어) *</label>
+      <input id="f-title-ko" placeholder="예: 남산타워 야경 관람">
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>제목 (영어)</label>
+        <input id="f-title-en" placeholder="Namsan Tower Night View">
+      </div>
+      <div class="form-row">
+        <label>제목 (일본어)</label>
+        <input id="f-title-ja" placeholder="南山タワー夜景観賞">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>제목 (중국어)</label>
+      <input id="f-title-zh" placeholder="南山塔夜景">
+    </div>
+    <div class="form-row">
+      <label>설명 (한국어)</label>
+      <textarea id="f-desc-ko" rows="2" placeholder="예: 야간 예약 20% 할인"></textarea>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>위도 *</label>
+        <input id="f-lat" type="number" step="0.0001" placeholder="37.5512">
+      </div>
+      <div class="form-row">
+        <label>경도 *</label>
+        <input id="f-lon" type="number" step="0.0001" placeholder="126.9882">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>반경 (km)</label>
+        <input id="f-radius" type="number" step="0.1" value="2">
+      </div>
+      <div class="form-row">
+        <label>우선순위 (1~10)</label>
+        <input id="f-priority" type="number" value="5">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>링크 URL</label>
+      <input id="f-link" placeholder="https://...">
+    </div>
+    <div class="form-row">
+      <label>스폰서</label>
+      <input id="f-sponsor" placeholder="서울시, 한국관광공사 등">
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>게시 시작일</label>
+        <input id="f-start" type="date">
+      </div>
+      <div class="form-row">
+        <label>게시 종료일</label>
+        <input id="f-end" type="date">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">취소</button>
+      <button class="btn" onclick="saveAd()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let editingId = null;
+
+async function loadAds() {
+  const ads = await fetch('/api/ads').then(r => r.json());
+  renderAds(ads);
+  updateStats(ads);
+}
+
+function renderAds(ads) {
+  const list = document.getElementById('ad-list');
+  const empty = document.getElementById('empty');
+  if (!ads.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = ads.map(ad => `
+    <div class="ad-card">
+      <div class="sponsor">📢 ${ad.sponsor || '광고'}</div>
+      <h3>${ad.title_ko || ad.title || ''}</h3>
+      <div class="desc">${ad.desc_ko || ad.desc || ''}</div>
+      <div class="meta">
+        📍 ${(ad.lat||0).toFixed(4)}, ${(ad.lon||0).toFixed(4)} · 반경 ${ad.radius || 2}km<br>
+        📅 ${ad.startDate || ''} ~ ${ad.endDate || ''}<br>
+        ⭐ 우선순위 ${ad.priority || 0} · ${ad.enabled ? '✅ 활성' : '⏸ 중지'}
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick='editAd(${JSON.stringify(ad)})'>✏️ 수정</button>
+        <button class="btn btn-danger" onclick="deleteAd('${ad.id}')">🗑 삭제</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateStats(ads) {
+  const now = new Date().toISOString().split('T')[0];
+  const active = ads.filter(a => a.enabled && a.startDate <= now && a.endDate >= now);
+  const regions = new Set(ads.map(a => `${Math.round(a.lat*10)/10},${Math.round(a.lon*10)/10}`));
+  document.getElementById('stat-total').textContent = ads.length;
+  document.getElementById('stat-active').textContent = active.length;
+  document.getElementById('stat-regions').textContent = regions.size;
+}
+
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = '광고 추가';
+  ['f-title-ko','f-title-en','f-title-ja','f-title-zh','f-desc-ko','f-lat','f-lon','f-link','f-sponsor']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-radius').value = 2;
+  document.getElementById('f-priority').value = 5;
+  const today = new Date().toISOString().split('T')[0];
+  const endDate = new Date(Date.now() + 90*24*60*60*1000).toISOString().split('T')[0];
+  document.getElementById('f-start').value = today;
+  document.getElementById('f-end').value = endDate;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function editAd(ad) {
+  editingId = ad.id;
+  document.getElementById('modal-title').textContent = '광고 수정';
+  document.getElementById('f-title-ko').value = ad.title_ko || '';
+  document.getElementById('f-title-en').value = ad.title_en || '';
+  document.getElementById('f-title-ja').value = ad.title_ja || '';
+  document.getElementById('f-title-zh').value = ad.title_zh || '';
+  document.getElementById('f-desc-ko').value = ad.desc_ko || '';
+  document.getElementById('f-lat').value = ad.lat || '';
+  document.getElementById('f-lon').value = ad.lon || '';
+  document.getElementById('f-radius').value = ad.radius || 2;
+  document.getElementById('f-priority').value = ad.priority || 5;
+  document.getElementById('f-link').value = ad.link || '';
+  document.getElementById('f-sponsor').value = ad.sponsor || '';
+  document.getElementById('f-start').value = ad.startDate || '';
+  document.getElementById('f-end').value = ad.endDate || '';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+async function saveAd() {
+  const ad = {
+    id: editingId,
+    title_ko: document.getElementById('f-title-ko').value,
+    title_en: document.getElementById('f-title-en').value,
+    title_ja: document.getElementById('f-title-ja').value,
+    title_zh: document.getElementById('f-title-zh').value,
+    desc_ko: document.getElementById('f-desc-ko').value,
+    lat: parseFloat(document.getElementById('f-lat').value),
+    lon: parseFloat(document.getElementById('f-lon').value),
+    radius: parseFloat(document.getElementById('f-radius').value) || 2,
+    priority: parseInt(document.getElementById('f-priority').value) || 5,
+    link: document.getElementById('f-link').value,
+    sponsor: document.getElementById('f-sponsor').value,
+    startDate: document.getElementById('f-start').value,
+    endDate: document.getElementById('f-end').value,
+    enabled: true
+  };
+  if (!ad.title_ko || isNaN(ad.lat) || isNaN(ad.lon)) {
+    alert('제목, 위도, 경도는 필수입니다');
+    return;
+  }
+  await fetch('/api/ads', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(ad)
+  });
+  closeModal();
+  loadAds();
+}
+
+async function deleteAd(id) {
+  if (!confirm('정말 삭제하시겠어요?')) return;
+  await fetch('/api/ads/' + id, { method: 'DELETE' });
+  loadAds();
+}
+
+loadAds();
+</script>
+</body>
+</html>

@@ -14,6 +14,7 @@ const { WebSocketServer } = require('ws');
 const { MockFlightProvider } = require('./mock-flight');
 const { FlightJudge } = require('./flight-judge');
 const { createApiProxy } = require('./api-proxy');
+const { createAdsApi } = require('./ads-api');
 
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +29,9 @@ app.use(express.static(path.join(__dirname, '..')));
 
 // ── Claude API 프록시 ──
 app.use('/api', createApiProxy());
+
+// ── 광고 API ──
+app.use('/api', createAdsApi());
 
 // ── 서버 상태 확인 ──
 app.get('/api/status', (req, res) => {
