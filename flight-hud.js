@@ -67,6 +67,9 @@ const FlightHUD = {
   // ── 비행 시작 ──
   startFlight(scenario = 'default') {
     this.flightActive = true;
+    this._flightStartTime = null; // 진행바 시간 리셋
+    this._lastPhase = null;
+    this._lastPOIName = null;
     this.send('start-flight', { scenario });
     this._showHUD();
   },
@@ -74,6 +77,10 @@ const FlightHUD = {
   // ── 비행 종료 ──
   stopFlight() {
     this.flightActive = false;
+    this._flightStartTime = null;
+    // 진행바 제거
+    const pw = document.getElementById('hud-progress-wrap');
+    if (pw) pw.remove();
     this.send('stop-flight');
     this._hideHUD();
   },
@@ -310,11 +317,15 @@ const FlightHUD = {
     setVal('hud-phase-icon', phase.icon);
     setVal('hud-phase-text', phase.text);
 
-    // 단계별 코칭 카드 (단계가 바뀔 때만 업데이트)
+    // 단계별 코칭 카드 + 배경 영상 (단계가 바뀔 때만)
     if (data.phase !== this._lastPhase) {
       this._lastPhase = data.phase;
       this._showPhaseCoaching(data.phase);
+      this._updateBackgroundVideo(data.phase);
     }
+
+    // 경로 진행바 업데이트
+    this._updateProgress(data);
 
     // 경고 처리
     if (judgment && judgment.messages.length > 0) {
@@ -413,6 +424,82 @@ const FlightHUD = {
 
   // ── 비행 단계별 코칭 카드 ──
   _lastPhase: null,
+  // ── 단계별 배경 영상 자동 전환 ──
+  _phaseVideos: {
+    parked:   'video/dashbord.mp4',
+    ready:    'video/dashbord.mp4',
+    taxi:     'video/throtl_ms.mp4',
+    takeoff:  'video/readytakeoff.mp4',
+    climb:    'video/readytakeoff.mp4',
+    cruise:   'video/york .mp4',
+    descent:  'video/landing.mp4',
+    approach: 'video/landing.mp4',
+    landing:  'video/landing.mp4',
+    landed:   'video/landing.mp4'
+  },
+
+  _updateBackgroundVideo(phase) {
+    const video = document.getElementById('hud-bg-video');
+    if (!video) return;
+    const newSrc = this._phaseVideos[phase];
+    if (!newSrc) return;
+    // 이미 같은 영상이면 건너뜀
+    const currentSrc = video.querySelector('source')?.src || '';
+    if (currentSrc.endsWith(newSrc)) return;
+    // 부드럽게 전환
+    video.style.opacity = '0.3';
+    setTimeout(() => {
+      const source = video.querySelector('source');
+      if (source) source.src = newSrc;
+      video.load();
+      video.play().catch(() => {});
+      video.style.opacity = '0.9';
+      video.style.transition = 'opacity 0.8s';
+    }, 200);
+  },
+
+  // ── 경로 진행바 + 비행 시간 ──
+  _flightStartTime: null,
+  _updateProgress(data) {
+    if (!data || !this.flightActive) return;
+    if (!this._flightStartTime) this._flightStartTime = Date.now();
+
+    const elapsedSec = Math.floor((Date.now() - this._flightStartTime) / 1000);
+    const min = Math.floor(elapsedSec / 60);
+    const sec = elapsedSec % 60;
+    const timeStr = `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+
+    // 단계별 진행률 계산 (대략)
+    const phaseOrder = ['parked','ready','taxi','takeoff','climb','cruise','descent','approach','landing','landed'];
+    const idx = Math.max(0, phaseOrder.indexOf(data.phase || 'parked'));
+    const progressPct = Math.round((idx / (phaseOrder.length - 1)) * 100);
+
+    // 진행바 표시 (없으면 생성)
+    let bar = document.getElementById('hud-progress-bar');
+    if (!bar) {
+      const wrap = document.createElement('div');
+      wrap.id = 'hud-progress-wrap';
+      wrap.style.cssText = 'position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:min(90vw,500px);z-index:55;pointer-events:none';
+      wrap.innerHTML = `
+        <div style="display:flex;justify-content:space-between;color:#fff;font-size:11px;margin-bottom:3px;padding:0 6px">
+          <span id="hud-progress-time">00:00</span>
+          <span id="hud-progress-label">0%</span>
+        </div>
+        <div style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);border-radius:8px;height:8px;overflow:hidden">
+          <div id="hud-progress-bar" style="height:100%;background:linear-gradient(90deg,#4ade80 0%,#FFD060 50%,#60a5fa 100%);width:0%;transition:width 0.5s"></div>
+        </div>
+      `;
+      const hud = document.getElementById('flight-hud');
+      if (hud) hud.appendChild(wrap);
+      bar = document.getElementById('hud-progress-bar');
+    }
+    if (bar) bar.style.width = progressPct + '%';
+    const timeEl = document.getElementById('hud-progress-time');
+    const labelEl = document.getElementById('hud-progress-label');
+    if (timeEl) timeEl.textContent = timeStr;
+    if (labelEl) labelEl.textContent = progressPct + '%';
+  },
+
   _showPhaseCoaching(phase) {
     const coaching = document.getElementById('hud-coaching');
     const msgEl = document.getElementById('hud-coaching-message');
@@ -537,18 +624,49 @@ const FlightHUD = {
     return (msgs[lang] || msgs.ko)[Math.min(stars, 4)];
   },
 
-  // ── 관광지 카드 ──
+  // ── 관광지 카드 (동적) ──
+  _lastPOIName: null,
   _showPOI(poi) {
     const card = document.getElementById('hud-poi-card');
-    if (!card) return;
+    if (!card || !poi) return;
+
     card.style.display = 'block';
-    document.getElementById('hud-poi-name').textContent = `📍 ${poi.name}`;
-    document.getElementById('hud-poi-desc').textContent = poi.desc;
+    card.style.animation = 'poi-slide-in 0.5s ease-out';
+    const nameEl = document.getElementById('hud-poi-name');
+    const descEl = document.getElementById('hud-poi-desc');
+    if (nameEl) nameEl.textContent = `📍 ${poi.name}`;
+    if (descEl) {
+      const distText = poi.distance != null ? ` (${poi.distance.toFixed(1)}km)` : '';
+      descEl.innerHTML = `${poi.desc || ''}${distText}<br><small style="opacity:0.7">🎤 질문하려면 마이크 버튼을 눌러보세요</small>`;
+    }
+
+    // 새 관광지면 효과음 + 음성 안내
+    if (this._lastPOIName !== poi.name) {
+      this._lastPOIName = poi.name;
+      if (typeof FlightAudio !== 'undefined') FlightAudio.playSFX('poiNearby');
+
+      // 음성 안내 (TTS)
+      if (typeof App !== 'undefined' && App.ttsOn) {
+        const lang = App.lang || 'ko';
+        const msg = {
+          ko: `${poi.name}에 가까워지고 있어요. ${poi.desc || ''}`,
+          en: `Approaching ${poi.name}. ${poi.desc || ''}`,
+          ja: `${poi.name}に近づいています。${poi.desc || ''}`,
+          zh: `正在接近${poi.name}。${poi.desc || ''}`
+        }[lang] || '';
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(msg);
+        u.lang = {ko:'ko-KR',en:'en-US',ja:'ja-JP',zh:'zh-CN'}[lang] || 'ko-KR';
+        u.rate = 0.92; u.pitch = 1.05;
+        window.speechSynthesis.speak(u);
+      }
+    }
   },
 
   _hidePOI() {
     const card = document.getElementById('hud-poi-card');
     if (card) card.style.display = 'none';
+    this._lastPOIName = null;
   },
 
   // ── 체크리스트 표시 ──
